@@ -24,7 +24,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _currentIndex = 0;
-  var list = ["menue1", "menue2", "menue3", "menue4", "menue5"];
+  var list = ["menu1", "menu2", "menu3", "menu4", "menu5"];
 
   List<Widget> get _children {
     return [
@@ -76,16 +76,16 @@ class _MyHomePageState extends State<MyHomePage> {
         currentIndex: _currentIndex,
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
+            icon: Icon(Icons.home),
+            label: 'Home',
           ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.store),
-              label: 'Store',
+            icon: Icon(Icons.store),
+            label: 'Store',
           ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.local_shipping),
-              label: 'Order',
+            icon: Icon(Icons.local_shipping),
+            label: 'Order',
           ),
         ],
         fixedColor: Colors.blueAccent,
@@ -104,15 +104,12 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget _messageItem(String title) {
     return Container(
       decoration: new BoxDecoration(
-          border: new Border(bottom: BorderSide(width: 0, color: Colors.white))
-      ),
-      child:ListTile(
+          border:
+              new Border(bottom: BorderSide(width: 0, color: Colors.white))),
+      child: ListTile(
         title: Text(
           title,
-          style: TextStyle(
-              color:Colors.black,
-              fontSize: 50.0
-          ),
+          style: TextStyle(color: Colors.black, fontSize: 50.0),
         ),
         onTap: () {
           null;
