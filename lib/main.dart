@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
+
+const stores = [LatLng(30.0, 30.0)];
 
 void main() {
   runApp(MyApp());
@@ -37,7 +41,34 @@ class _MyHomePageState extends State<MyHomePage> {
         },
         itemCount: list.length,
       ),
-      Center(child: Text('Search')),
+      FlutterMap(
+        options: MapOptions(
+          initialCenter: stores[0],
+          initialZoom: 15.0,
+        ),
+        children: [
+          // Map Tile
+          TileLayer(
+            urlTemplate:
+              'https://tile.openstreetmap.org/{z}/{x}/{y}.png', // OSMF's Tile Server
+              // 'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg',
+            userAgentPackageName: 'com.latin_one.app',
+            maxNativeZoom: 19,
+          ),
+
+          // Store location
+          MarkerLayer(markers: createMarkers(stores)),
+
+          // Attribution
+          const RichAttributionWidget(
+            attributions: [
+              TextSourceAttribution(
+                'OpenStreetMap contributors',
+              ),
+            ],
+          ),
+        ],
+      ),
       Center(child: Text('Settings')),
     ];
   }
@@ -120,4 +151,61 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+}
+
+void showStoreInfo(LatLng point, BuildContext ctx) {
+  showModalBottomSheet<void>(
+    context: ctx,
+    builder: (BuildContext context) {
+      return Container(
+        height: 400,
+        child: SingleChildScrollView(
+            child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            const ListTile(
+              leading: Icon(Icons.music_note),
+              title: Text('Music'),
+              subtitle: Text('Select your favorite music'),
+            ),
+            const ListTile(
+              leading: Icon(Icons.photo_album),
+              title: Text('Photos'),
+              subtitle: Text('Select your favorite photos'),
+            ),
+            const ListTile(
+              leading: Icon(Icons.videocam),
+              title: Text('Video'),
+              subtitle: Text('Select your favorite video'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Close'),
+            ),
+          ],
+        )),
+      );
+    },
+  );
+}
+
+List<Marker> createMarkers(List<LatLng> points) {
+  var markers = <Marker>[];
+  points.forEach((point) {
+    markers.add(Marker(
+      point: point,
+      child: GestureDetector(
+        onTap: () {
+          // showStoreInfo(point, ctx);
+        },
+        behavior: HitTestBehavior.opaque,
+        child:  const Icon(
+          Icons.location_on,
+          color: Colors.red,
+          size: 40,
+        ),
+      )
+    ));
+  });
+  return markers;
 }
