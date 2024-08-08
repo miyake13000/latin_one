@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
+
+const stores = [LatLng(30.0, 30.0)];
 
 void main() {
   runApp(MyApp());
@@ -24,7 +28,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _currentIndex = 0;
-  var list = ["menue1", "menue2", "menue3", "menue4", "menue5"];
+  var list = ["menu1", "menu2", "menu3", "menu4", "menu5"];
 
   List<Widget> get _children {
     return [
@@ -37,7 +41,34 @@ class _MyHomePageState extends State<MyHomePage> {
         },
         itemCount: list.length,
       ),
-      Center(child: Text('Search')),
+      FlutterMap(
+        options: MapOptions(
+          initialCenter: stores[0],
+          initialZoom: 15.0,
+        ),
+        children: [
+          // Map Tile
+          TileLayer(
+            urlTemplate:
+              'https://tile.openstreetmap.org/{z}/{x}/{y}.png', // OSMF's Tile Server
+              // 'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg',
+            userAgentPackageName: 'com.latin_one.app',
+            maxNativeZoom: 19,
+          ),
+
+          // Store location
+          MarkerLayer(markers: createMarkers(stores)),
+
+          // Attribution
+          const RichAttributionWidget(
+            attributions: [
+              TextSourceAttribution(
+                'OpenStreetMap contributors',
+              ),
+            ],
+          ),
+        ],
+      ),
       Center(child: Text('Settings')),
     ];
   }
@@ -76,16 +107,16 @@ class _MyHomePageState extends State<MyHomePage> {
         currentIndex: _currentIndex,
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
+            icon: Icon(Icons.home),
+            label: 'Home',
           ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.store),
-              label: 'Store',
+            icon: Icon(Icons.store),
+            label: 'Store',
           ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.local_shipping),
-              label: 'Order',
+            icon: Icon(Icons.local_shipping),
+            label: 'Order',
           ),
         ],
         fixedColor: Colors.blueAccent,
@@ -104,15 +135,12 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget _messageItem(String title) {
     return Container(
       decoration: new BoxDecoration(
-          border: new Border(bottom: BorderSide(width: 0, color: Colors.white))
-      ),
-      child:ListTile(
+          border:
+              new Border(bottom: BorderSide(width: 0, color: Colors.white))),
+      child: ListTile(
         title: Text(
           title,
-          style: TextStyle(
-              color:Colors.black,
-              fontSize: 50.0
-          ),
+          style: TextStyle(color: Colors.black, fontSize: 50.0),
         ),
         onTap: () {
           null;
@@ -123,4 +151,61 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+}
+
+void showStoreInfo(LatLng point, BuildContext ctx) {
+  showModalBottomSheet<void>(
+    context: ctx,
+    builder: (BuildContext context) {
+      return Container(
+        height: 400,
+        child: SingleChildScrollView(
+            child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            const ListTile(
+              leading: Icon(Icons.music_note),
+              title: Text('Music'),
+              subtitle: Text('Select your favorite music'),
+            ),
+            const ListTile(
+              leading: Icon(Icons.photo_album),
+              title: Text('Photos'),
+              subtitle: Text('Select your favorite photos'),
+            ),
+            const ListTile(
+              leading: Icon(Icons.videocam),
+              title: Text('Video'),
+              subtitle: Text('Select your favorite video'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Close'),
+            ),
+          ],
+        )),
+      );
+    },
+  );
+}
+
+List<Marker> createMarkers(List<LatLng> points) {
+  var markers = <Marker>[];
+  points.forEach((point) {
+    markers.add(Marker(
+      point: point,
+      child: GestureDetector(
+        onTap: () {
+          // showStoreInfo(point, ctx);
+        },
+        behavior: HitTestBehavior.opaque,
+        child:  const Icon(
+          Icons.location_on,
+          color: Colors.red,
+          size: 40,
+        ),
+      )
+    ));
+  });
+  return markers;
 }
