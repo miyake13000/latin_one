@@ -1,14 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
+import 'main_page.dart';
+import 'order_page.dart';
+import 'store_page.dart';
 
-const stores = [LatLng(30.0, 30.0)];
+enum SelectedScreen {
+  main(0),
+  store(1),
+  order(2);
 
-void main() {
-  runApp(MyApp());
+  const SelectedScreen(this.value);
+  final int value;
 }
 
-class MyApp extends StatelessWidget {
+void main() {
+  runApp(const App());
+}
+
+class App extends StatelessWidget {
+  const App({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -16,79 +26,47 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(),
+      home: const Home(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
+class Home extends StatefulWidget {
+  const Home({super.key});
+
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  HomeState createState() => HomeState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _currentIndex = 0;
-  var list = ["menu1", "menu2", "menu3", "menu4", "menu5"];
+class HomeState extends State<Home> {
+  int screenIndex = 0;
 
-  List<Widget> get _children {
-    return [
-      ListView.separated(
-        itemBuilder: (BuildContext context, int index) {
-          return _messageItem(list[index]);
-        },
-        separatorBuilder: (BuildContext context, int index) {
-          return separatorItem();
-        },
-        itemCount: list.length,
-      ),
-      FlutterMap(
-        options: MapOptions(
-          initialCenter: stores[0],
-          initialZoom: 15.0,
-        ),
-        children: [
-          // Map Tile
-          TileLayer(
-            urlTemplate:
-              'https://tile.openstreetmap.org/{z}/{x}/{y}.png', // OSMF's Tile Server
-              // 'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg',
-            userAgentPackageName: 'com.latin_one.app',
-            maxNativeZoom: 19,
-          ),
-
-          // Store location
-          MarkerLayer(markers: createMarkers(stores)),
-
-          // Attribution
-          const RichAttributionWidget(
-            attributions: [
-              TextSourceAttribution(
-                'OpenStreetMap contributors',
-              ),
-            ],
-          ),
-        ],
-      ),
-      Center(child: Text('Settings')),
-    ];
+  void handleScreenChanged(int index) {
+    setState(() {
+      screenIndex = index;
+    });
   }
 
-  void onTabTapped(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
+  Widget createScreen(SelectedScreen selectedScreen) {
+    switch (selectedScreen) {
+      case SelectedScreen.main:
+        return const MainPage();
+      case SelectedScreen.store:
+        return const StorePage();
+      case SelectedScreen.order:
+        return const OrderPage();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      //AppBar
       appBar: AppBar(
-        leading: Icon(Icons.menu),
+        leading: const Icon(Icons.menu),
         title: const Text('LatinOne'),
         backgroundColor: Colors.orange,
         centerTitle: true,
-        actions: <Widget>[
+        actions: const <Widget>[
           IconButton(
             icon: Icon(Icons.email, color: Colors.white),
             onPressed: null, //TODO:実装
@@ -99,13 +77,20 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       ),
+
       //Body
-      body: _children[_currentIndex],
+      body: createScreen(SelectedScreen.values[screenIndex]),
+
       // BottomNavigationBar
       bottomNavigationBar: BottomNavigationBar(
-        onTap: onTabTapped,
-        currentIndex: _currentIndex,
-        items: <BottomNavigationBarItem>[
+        onTap: (index) {
+          setState(() {
+            screenIndex = index;
+            handleScreenChanged(screenIndex);
+          });
+        },
+        currentIndex: screenIndex,
+        items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
@@ -124,88 +109,4 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
-
-  Widget separatorItem() {
-    return Container(
-      height: 10,
-      color: Colors.orange,
-    );
-  }
-
-  Widget _messageItem(String title) {
-    return Container(
-      decoration: new BoxDecoration(
-          border:
-              new Border(bottom: BorderSide(width: 0, color: Colors.white))),
-      child: ListTile(
-        title: Text(
-          title,
-          style: TextStyle(color: Colors.black, fontSize: 50.0),
-        ),
-        onTap: () {
-          null;
-        }, // タップ
-        onLongPress: () {
-          null;
-        }, // 長押し
-      ),
-    );
-  }
-}
-
-void showStoreInfo(LatLng point, BuildContext ctx) {
-  showModalBottomSheet<void>(
-    context: ctx,
-    builder: (BuildContext context) {
-      return Container(
-        height: 400,
-        child: SingleChildScrollView(
-            child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            const ListTile(
-              leading: Icon(Icons.music_note),
-              title: Text('Music'),
-              subtitle: Text('Select your favorite music'),
-            ),
-            const ListTile(
-              leading: Icon(Icons.photo_album),
-              title: Text('Photos'),
-              subtitle: Text('Select your favorite photos'),
-            ),
-            const ListTile(
-              leading: Icon(Icons.videocam),
-              title: Text('Video'),
-              subtitle: Text('Select your favorite video'),
-            ),
-            ElevatedButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Close'),
-            ),
-          ],
-        )),
-      );
-    },
-  );
-}
-
-List<Marker> createMarkers(List<LatLng> points) {
-  var markers = <Marker>[];
-  points.forEach((point) {
-    markers.add(Marker(
-      point: point,
-      child: GestureDetector(
-        onTap: () {
-          // showStoreInfo(point, ctx);
-        },
-        behavior: HitTestBehavior.opaque,
-        child:  const Icon(
-          Icons.location_on,
-          color: Colors.red,
-          size: 40,
-        ),
-      )
-    ));
-  });
-  return markers;
 }
