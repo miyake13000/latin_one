@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'pages.dart';
+import 'router.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
