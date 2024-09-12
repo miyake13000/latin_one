@@ -4,6 +4,7 @@ import 'package:latlong2/latlong.dart';
 
 const stores = [
   Store(
+    0,
     'お店1',
     LatLng(30.0, 30.0),
     'とある県どっか地方',
@@ -14,6 +15,7 @@ const stores = [
 ];
 
 class Store {
+  final int    id;
   final String name;
   final LatLng location;
   final String address;
@@ -22,13 +24,14 @@ class Store {
   final String holiday;
 
   const Store(
-      this.name,
-      this.location,
-      this.address,
-      this.phoneNumber,
-      this.openingHours,
-      this.holiday
-      );
+    this. id,
+    this.name,
+    this.location,
+    this.address,
+    this.phoneNumber,
+    this.openingHours,
+    this.holiday
+  );
 }
 
 class StorePage extends StatelessWidget {
