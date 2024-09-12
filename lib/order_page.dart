@@ -66,7 +66,7 @@ class OrderForm extends StatelessWidget {
         const SizedBox(height: 16.0),
 
         // 決定ボタン
-        const SubmitButton(orderData),
+        SubmitButton(orderData),
       ],
     );
   }
