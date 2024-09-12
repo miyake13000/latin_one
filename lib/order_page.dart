@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'order.dart';
+import 'store_page.dart';
 
 class OrderPage extends StatelessWidget {
   const OrderPage({super.key});
@@ -11,7 +14,7 @@ class OrderPage extends StatelessWidget {
       ),
       body: const Padding(
         padding: EdgeInsets.all(16.0),
-        child: OrderForm(), // フォームウィジェットを配置
+        child: OrderForm(),
       ),
     );
   }
@@ -22,29 +25,25 @@ class OrderForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final orderData = Provider.of<Order>(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // 店舗選択
-        const Text('店舗を選択'),
-        const DropdownButtonOrder(
-          items: ['A', 'B'],
-        ),
-        SizedBox(height: 16.0),
+        // 店舗選択ボタン
+        StoreSelectButton(orderData.storeId),
+        const SizedBox(height: 16.0),
 
-        // 商品選択
-        const Text('商品を選択'),
-        const DropdownButtonOrder(
-          items: ['1', '2'],
-        ),
-        SizedBox(height: 16.0),
+        // 商品選択ボタン
+        ProductSelectButton(orderData.products),
+        const SizedBox(height: 16.0),
 
         // 支払い方法選択
         const Text('支払い方法を選択'),
         const DropdownButtonOrder(
-          items: ['現金', 'クレジットカード'],
+          items: ['現金', 'クレジットカード', 'PayPay'],
         ),
-        SizedBox(height: 16.0),
+        const SizedBox(height: 16.0),
 
         // 氏名入力
         const Text('氏名を入力'),
@@ -54,7 +53,7 @@ class OrderForm extends StatelessWidget {
             labelText: '氏名',
           ),
         ),
-        SizedBox(height: 16.0),
+        const SizedBox(height: 16.0),
 
         // 住所入力
         const Text('住所を入力'),
@@ -64,36 +63,106 @@ class OrderForm extends StatelessWidget {
             labelText: '住所',
           ),
         ),
-        SizedBox(height: 16.0),
+        const SizedBox(height: 16.0),
 
         // 決定ボタン
-        SizedBox(
-          width: double.infinity, // ボタンを横幅いっぱいに広げる
-          child: ElevatedButton(
-            onPressed: () {
-              // ボタン押下時の処理
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: const Text('確認'),
-                    content: const Text('注文確認画面に遷移したいね．'),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text('OK'),
-                      ),
-                    ],
-                  );
-                },
-              );
-            },
-            child: const Text('決定'),
+        const SubmitButton(orderData),
+      ],
+    );
+  }
+
+}
+class StoreSelectButton extends StatelessWidget {
+  final int? storeId;
+
+  const StoreSelectButton(this.storeId, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    String text;
+    if (storeId == null) {
+      text = '店舗を選択';
+    } else {
+      text = '店舗を選択済み';
+    }
+
+    return SizedBox(
+      width: double.infinity, // ボタンを横幅いっぱいに広げる
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.zero, // 四角にするために角丸を0に設定
           ),
         ),
-      ],
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const StorePage()),
+          );
+        },
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(text),
+            const SizedBox(width: 8.0),
+            const Icon(Icons.arrow_circle_right),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ProductSelectButton extends StatelessWidget {
+  final List<(int, int)> products;
+
+  const ProductSelectButton(this.products, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    String text;
+    if (products.isEmpty) {
+      text = '商品を選択';
+    } else {
+      text = '商品を選択済み';
+    }
+
+    return SizedBox(
+      width: double.infinity, // ボタンを横幅いっぱいに広げる
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.zero, // 四角にするために角丸を0に設定
+          ),
+        ),
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('商品選択'),
+                content: const Text('商品選択画面に遷移したいね．'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+        },
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(text),
+            const SizedBox(width: 8.0),
+            const Icon(Icons.arrow_circle_right),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -126,6 +195,42 @@ class _DropdownButtonOrderState extends State<DropdownButtonOrder> {
           child: Text(value),
         );
       }).toList(),
+    );
+  }
+}
+
+class SubmitButton extends StatelessWidget {
+  final Order orderData;
+
+  const SubmitButton(this.orderData, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity, // ボタンを横幅いっぱいに広げる
+      child: ElevatedButton(
+        onPressed: () {
+          // ボタン押下時の処理
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('確認'),
+                content: const Text('注文確認画面に遷移したいね．'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+        },
+        child: const Text('決定'),
+      ),
     );
   }
 }
