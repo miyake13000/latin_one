@@ -1,24 +1,56 @@
 import 'package:flutter/material.dart';
-import 'main_page.dart';
+import 'package:go_router/go_router.dart';
+import 'home_page.dart';
 import 'order_page.dart';
 import 'store_page.dart';
+import 'layout.dart';
 
-enum SelectedScreen {
-  main(0),
-  store(1),
-  order(2);
+final GlobalKey<NavigatorState> _rootNavigatorKey =
+    GlobalKey<NavigatorState>(debugLabel: 'root');
+final GlobalKey<NavigatorState> _contentNavigatorKey =
+    GlobalKey<NavigatorState>(debugLabel: 'content');
 
-  const SelectedScreen(this.value);
-  final int value;
-
-  Widget create() {
-    switch (this) {
-      case SelectedScreen.main:
-        return const MainPage();
-      case SelectedScreen.store:
-        return const StorePage();
-      case SelectedScreen.order:
-        return const OrderPage();
-    }
-  }
-}
+final GoRouter router = GoRouter(
+  navigatorKey: _rootNavigatorKey,
+  initialLocation: '/home',
+  routes: <RouteBase>[
+    StatefulShellRoute.indexedStack(
+      builder: (BuildContext context,
+                GoRouterState state,
+                StatefulNavigationShell navigationShell)
+      {
+          return AppLayout(navigationShell: navigationShell);
+      },
+      branches: <StatefulShellBranch>[
+        StatefulShellBranch(
+          navigatorKey: _contentNavigatorKey,
+          routes: <RouteBase>[
+            GoRoute(
+              path: '/home',
+              builder: (BuildContext context, GoRouterState state) =>
+                const HomePage(),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: <RouteBase>[
+            GoRoute(
+              path: '/store',
+              builder: (BuildContext context, GoRouterState state) =>
+                const StorePage(),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: <RouteBase>[
+            GoRoute(
+              path: '/order',
+              builder: (BuildContext context, GoRouterState state) =>
+                const OrderPage(),
+            ),
+          ],
+        ),
+      ],
+    ),
+  ],
+);
