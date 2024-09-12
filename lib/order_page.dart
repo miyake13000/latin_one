@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import 'order.dart';
-import 'store_page.dart';
 
 class OrderPage extends StatelessWidget {
   const OrderPage({super.key});
@@ -97,10 +97,7 @@ class StoreSelectButton extends StatelessWidget {
           ),
         ),
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const StorePage()),
-          );
+          GoRouter.of(context).go('/store');
         },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -116,7 +113,7 @@ class StoreSelectButton extends StatelessWidget {
 }
 
 class ProductSelectButton extends StatelessWidget {
-  final List<(int, int)> products;
+  final List<OrderedProduct> products;
 
   const ProductSelectButton(this.products, {super.key});
 

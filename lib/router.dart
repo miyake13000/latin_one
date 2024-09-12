@@ -12,7 +12,7 @@ final GlobalKey<NavigatorState> _contentNavigatorKey =
 
 final GoRouter router = GoRouter(
   navigatorKey: _rootNavigatorKey,
-  initialLocation: '/home',
+  initialLocation: '/',
   routes: <RouteBase>[
     StatefulShellRoute.indexedStack(
       builder: (BuildContext context,
@@ -26,7 +26,7 @@ final GoRouter router = GoRouter(
           navigatorKey: _contentNavigatorKey,
           routes: <RouteBase>[
             GoRoute(
-              path: '/home',
+              path: '/',
               builder: (BuildContext context, GoRouterState state) =>
                 const HomePage(),
             ),
