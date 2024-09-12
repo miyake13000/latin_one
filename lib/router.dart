@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'home_page.dart';
-import 'order_page.dart';
-import 'store_page.dart';
-import 'layout.dart';
+import 'pages/home_page.dart';
+import 'pages/order_page.dart';
+import 'pages/store_page.dart';
+import 'pages/layout.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey =
     GlobalKey<NavigatorState>(debugLabel: 'root');
@@ -12,7 +12,7 @@ final GlobalKey<NavigatorState> _contentNavigatorKey =
 
 final GoRouter router = GoRouter(
   navigatorKey: _rootNavigatorKey,
-  initialLocation: '/home',
+  initialLocation: '/',
   routes: <RouteBase>[
     StatefulShellRoute.indexedStack(
       builder: (BuildContext context,
@@ -26,7 +26,7 @@ final GoRouter router = GoRouter(
           navigatorKey: _contentNavigatorKey,
           routes: <RouteBase>[
             GoRoute(
-              path: '/home',
+              path: '/',
               builder: (BuildContext context, GoRouterState state) =>
                 const HomePage(),
             ),

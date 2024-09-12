@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'order.dart';
+import 'resources/order.dart';
 import 'router.dart';
 
 void main() {

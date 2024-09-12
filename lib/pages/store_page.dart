@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'order.dart';
-import 'store.dart';
+import '../resources/order.dart';
+import '../resources/store.dart';
 
 const stores = [
   Store(
@@ -112,6 +113,7 @@ class StorePage extends StatelessWidget {
               ElevatedButton(
                 onPressed: () => {
                   orderData.changeStore(store.id),
+                  GoRouter.of(context).go('/order'),
                 },
                 child: const Text('この店舗を選択'),
               ),
