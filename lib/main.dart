@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'order.dart';
-import 'home.dart';
+import 'router.dart';
 
 void main() {
   runApp(App());
@@ -15,12 +15,12 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<Order>(
       create: (context) => Order(),
-      child: MaterialApp(
+      child: MaterialApp.router(
         title: 'LatinOne',
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: const Home(),
+        routerConfig: router,
       ),
     );
   }

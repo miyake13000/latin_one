@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 var text = ["Order", "Product", "Stores", "Recommend"];
 var list = ["IMG_8832.jpg", "IMG_8833.jpg", "IMG_8834.jpg", "IMG_8835.jpg"];
 
-class MainPage extends StatelessWidget {
-  const MainPage({super.key});
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {

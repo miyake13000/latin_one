@@ -1,25 +1,19 @@
 import 'package:flutter/material.dart';
-import 'pages.dart';
+import 'package:go_router/go_router.dart';
 
-class Home extends StatefulWidget {
-  const Home({super.key});
+class AppLayout extends StatelessWidget {
+  const AppLayout({
+    required this.navigationShell,
+    super.key,
+  });
 
-  @override
-  HomeState createState() => HomeState();
-}
-
-class HomeState extends State<Home> {
-  int screenIndex = 0;
-
-  void handleScreenChanged(int index) {
-    setState(() {
-      screenIndex = index;
-    });
-  }
+  final StatefulNavigationShell navigationShell;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
+      // AppBar
       appBar: AppBar(
         leading: const Icon(Icons.menu),
         title: const Text('LatinOne'),
@@ -38,17 +32,14 @@ class HomeState extends State<Home> {
       ),
 
       //Body
-      body: SelectedScreen.values[screenIndex].create(),
+      body: navigationShell,
 
       // BottomNavigationBar
       bottomNavigationBar: BottomNavigationBar(
-        onTap: (index) {
-          setState(() {
-            screenIndex = index;
-            handleScreenChanged(screenIndex);
-          });
-        },
-        currentIndex: screenIndex,
+        type: BottomNavigationBarType.fixed,
+        onTap: (int index) => navigationShell.goBranch(index),
+        currentIndex: navigationShell.currentIndex,
+        fixedColor: Colors.blueAccent,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
@@ -63,8 +54,6 @@ class HomeState extends State<Home> {
             label: 'Order',
           ),
         ],
-        fixedColor: Colors.blueAccent,
-        type: BottomNavigationBarType.fixed,
       ),
     );
   }
