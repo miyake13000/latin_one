@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'order.dart';
+import 'store.dart';
 
 const stores = [
   Store(
@@ -13,26 +16,6 @@ const stores = [
     '水，土，日'
   )
 ];
-
-class Store {
-  final int    id;
-  final String name;
-  final LatLng location;
-  final String address;
-  final String phoneNumber;
-  final String openingHours;
-  final String holiday;
-
-  const Store(
-    this. id,
-    this.name,
-    this.location,
-    this.address,
-    this.phoneNumber,
-    this.openingHours,
-    this.holiday
-  );
-}
 
 class StorePage extends StatelessWidget {
   const StorePage({super.key});
@@ -88,6 +71,8 @@ class StorePage extends StatelessWidget {
   }
 
   void showStoreInfo(Store store, BuildContext ctx) {
+    final orderData = Provider.of<Order>(ctx, listen: false);
+
     showModalBottomSheet<void>(
       context: ctx,
       builder: (BuildContext context) {
@@ -121,6 +106,12 @@ class StorePage extends StatelessWidget {
                 leading: const Icon(Icons.event_busy),
                 title: const Text('定休日'),
                 subtitle: Text(store.holiday),
+              ),
+              ElevatedButton(
+                onPressed: () => {
+                  orderData.changeStore(store.id),
+                },
+                child: const Text('この店舗を選択'),
               ),
               ElevatedButton(
                 onPressed: () => Navigator.pop(context),

@@ -8,5 +8,6 @@ class Order extends ChangeNotifier {
 
   void changeStore(int id) {
     storeId = id;
+    notifyListeners();
   }
 }
