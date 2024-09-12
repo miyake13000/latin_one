@@ -12,9 +12,11 @@ class OrderPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('注文ページ'),
       ),
-      body: const Padding(
-        padding: EdgeInsets.all(16.0),
-        child: OrderForm(),
+      body: const SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: OrderForm(),
+        ),
       ),
     );
   }

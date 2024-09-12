@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'order.dart';
 import 'store.dart';
 
@@ -96,6 +97,7 @@ class StorePage extends StatelessWidget {
                 leading: const Icon(Icons.call),
                 title: const Text('電話'),
                 subtitle: Text(store.phoneNumber),
+                onTap: () => _makePhoneCall(store.phoneNumber),
               ),
               ListTile(
                 leading: const Icon(Icons.schedule),
@@ -122,5 +124,14 @@ class StorePage extends StatelessWidget {
         );
       },
     );
+  }
+
+  Future<void> _makePhoneCall(String phoneNumber) async {
+    final Uri phoneUri = Uri(scheme: 'tel', path: phoneNumber);
+    if (await canLaunchUrl(phoneUri)) {
+      await launchUrl(phoneUri);
+    } else {
+      throw 'Could not launch $phoneUri';
+    }
   }
 }
