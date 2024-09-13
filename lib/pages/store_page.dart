@@ -113,6 +113,7 @@ class StorePage extends StatelessWidget {
               ElevatedButton(
                 onPressed: () => {
                   orderData.changeStore(store.id),
+                  Navigator.pop(context),
                   GoRouter.of(context).go('/order'),
                 },
                 child: const Text('この店舗を選択'),
