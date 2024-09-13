@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../resources/order.dart';
+import '../resources/store.dart';
 
 class OrderPage extends StatelessWidget {
   const OrderPage({super.key});
@@ -33,7 +34,7 @@ class OrderForm extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // 店舗選択ボタン
-        StoreSelectButton(orderData.storeId),
+        StoreSelectButton(orderData.store),
         const SizedBox(height: 16.0),
 
         // 商品選択ボタン
@@ -75,17 +76,17 @@ class OrderForm extends StatelessWidget {
 
 }
 class StoreSelectButton extends StatelessWidget {
-  final int? storeId;
+  final Store? store;
 
-  const StoreSelectButton(this.storeId, {super.key});
+  const StoreSelectButton(this.store, {super.key});
 
   @override
   Widget build(BuildContext context) {
     String text;
-    if (storeId == null) {
+    if (store == null) {
       text = '店舗を選択';
     } else {
-      text = '店舗を選択済み';
+      text = store!.name;
     }
 
     return SizedBox(
