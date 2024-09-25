@@ -4,8 +4,9 @@ class Product {
   final String description;
   final int    price;
   final String image;
+  int num = 0;
 
-  const Product(
+  Product(
     this.id,
     this.name,
     this.description,

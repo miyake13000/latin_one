@@ -53,6 +53,10 @@ class AppLayout extends StatelessWidget {
             icon: Icon(Icons.local_shipping),
             label: 'Order',
           ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_cart),
+            label: 'Product',
+          ),
         ],
       ),
     );
