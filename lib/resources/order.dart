@@ -5,6 +5,9 @@ import '../resources/product.dart';
 class Order extends ChangeNotifier {
   Store? store;
   List<OrderedProduct> products = [];
+  String? pay;
+  var name = TextEditingController();
+  var address = TextEditingController();
 
   void changeStore(Store newStore) {
     store = newStore;
@@ -18,6 +21,11 @@ class Order extends ChangeNotifier {
     } else {
       products[idx] = OrderedProduct(product, quantity);
     }
+    notifyListeners();
+  }
+
+  void changePay(String? item){
+    pay = item;
     notifyListeners();
   }
 }
