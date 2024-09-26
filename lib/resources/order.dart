@@ -24,6 +24,15 @@ class Order extends ChangeNotifier {
     notifyListeners();
   }
 
+int getOrderedProductQuantity(Product product) {
+    int idx = products.indexWhere((o) => o.product.id == product.id);
+    if (idx == -1) {
+      return 0;
+    } else {
+      return products[idx].quantity;
+    }
+}
+
   void changePay(String? item){
     pay = item;
     notifyListeners();

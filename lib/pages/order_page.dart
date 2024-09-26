@@ -13,7 +13,7 @@ class OrderPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('注文ページ'),
       ),
-      body: SingleChildScrollView(
+      body: const SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.all(16.0),
           child: OrderForm(),
@@ -24,15 +24,13 @@ class OrderPage extends StatelessWidget {
 }
 
 class OrderForm extends StatefulWidget {
+  const OrderForm({super.key});
 
   @override
-  _OrderFormState createState() => _OrderFormState();
+  OrderFormState createState() => OrderFormState();
 }
 
-class _OrderFormState extends State<OrderForm> {
-
-  // const OrderForm({super.key});
-
+class OrderFormState extends State<OrderForm> {
   @override
   Widget build(BuildContext context) {
     final orderData = Provider.of<Order>(context);
@@ -50,9 +48,9 @@ class _OrderFormState extends State<OrderForm> {
 
         // 支払い方法選択
         const Text('支払い方法を選択'),
-        DropdownButtonOrder(
-          items: const ['現金', 'クレジットカード', 'PayPay'],
-          orderData: orderData//orderData.pay
+        PaymentMethodDropdown(
+          methods: const ['現金', 'クレジットカード', 'PayPay'],
+          order: orderData,
         ),
         const SizedBox(height: 16.0),
 
@@ -107,7 +105,7 @@ class StoreSelectButton extends StatelessWidget {
           ),
         ),
         onPressed: () {
-          GoRouter.of(context).go('/store');
+          GoRouter.of(context).push('/store');
         },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -145,23 +143,7 @@ class ProductSelectButton extends StatelessWidget {
           ),
         ),
         onPressed: () {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: const Text('商品選択'),
-                content: const Text('商品選択画面に遷移したいね．'),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text('OK'),
-                  ),
-                ],
-              );
-            },
-          );
+          GoRouter.of(context).push('/product');
         },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -176,30 +158,30 @@ class ProductSelectButton extends StatelessWidget {
   }
 }
 
-class DropdownButtonOrder extends StatefulWidget {
-  final List<String> items;
-  Order? orderData;
+class PaymentMethodDropdown extends StatefulWidget {
+  final List<String> methods;
+  final Order? order;
 
-  DropdownButtonOrder({super.key, required this.items, this.orderData});
+  const PaymentMethodDropdown({super.key, required this.methods, this.order});
   @override
-  _DropdownButtonOrderState createState() => _DropdownButtonOrderState();
+  PaymentMethodDropdownState createState() => PaymentMethodDropdownState();
 }
 
-class _DropdownButtonOrderState extends State<DropdownButtonOrder> {
-  String? _selectedItem;
+class PaymentMethodDropdownState extends State<PaymentMethodDropdown> {
+  String? selectedItem;
 
   @override
   Widget build(BuildContext context) {
     return DropdownButton<String>(
       hint: const Text('選択してください'), // 初期状態のテキスト
-      value: _selectedItem,
+      value: selectedItem,
       onChanged: (String? newValue) {
         setState(() {
-          _selectedItem = newValue;
+          selectedItem = newValue;
         });
-        widget.orderData?.changePay(newValue);
+        widget.order?.changePay(newValue);
       },
-      items: widget.items.map<DropdownMenuItem<String>>((String value) {
+      items: widget.methods.map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
           value: value,
           child: Text(value),
@@ -222,9 +204,9 @@ class SubmitButton extends StatelessWidget {
         onPressed:() =>
         {
           if(isOrderDataCompleted(orderData)){
-            _DisplayDialog(context, "注文確認画面に遷移したいね．")
+            displayDialog(context, "注文確認画面に遷移したいね．")
           }else{
-            _DisplayDialog(context, "入力されていない情報があります")
+            displayDialog(context, "入力されていない情報があります")
           }
         },
         child: const Text('決定'),
@@ -232,30 +214,30 @@ class SubmitButton extends StatelessWidget {
     );
   }
 
- void _DisplayDialog(BuildContext context, String log){
+  void displayDialog(BuildContext context, String log){
     showDialog(
-     context: context,
-     builder: (BuildContext context) {
-       return AlertDialog(
-         title: const Text('確認'),
-         content: Text(log),
-         actions: [
-           TextButton(
-             onPressed: () {
-               Navigator.of(context).pop();
-             },
-             child: const Text('OK'),
-           ),
-         ],
-       );
-     },
-   );
- }
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('確認'),
+          content: Text(log),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
 
 bool isOrderDataCompleted(orderData){
     return orderData.store != null
-           //&& orderData.products.isNotEmpty TODO:Productページの実装
+           && orderData.products.isNotEmpty
            && orderData.pay != null
            && orderData.name.text.isNotEmpty
            && orderData.address.text.isNotEmpty;
