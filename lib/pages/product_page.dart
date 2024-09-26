@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:go_router/go_router.dart';
 import '../resources/product.dart';
 import '../resources/order.dart';
 
@@ -20,17 +19,19 @@ class ProductPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('商品ページ'),
       ),
-      body: ProductForm(),
+      body: const ProductForm(),
         );
   }
 }
 
 class ProductForm extends StatefulWidget {
+  const ProductForm({super.key});
+
   @override
-  _ProductFormState createState() => _ProductFormState();
+  ProductFormState createState() => ProductFormState();
 }
 
-class _ProductFormState extends State<ProductForm> {
+class ProductFormState extends State<ProductForm> {
   @override
   Widget build(BuildContext context) {
     final orderData = Provider.of<Order>(context);
@@ -50,7 +51,7 @@ class _ProductFormState extends State<ProductForm> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // アイコン
-                Icon(
+                const Icon(
                   Icons.shopping_cart,
                   size: 50.0,
                 ),

@@ -13,7 +13,7 @@ class OrderPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('注文ページ'),
       ),
-      body: SingleChildScrollView(
+      body: const SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.all(16.0),
           child: OrderForm(),
@@ -24,15 +24,13 @@ class OrderPage extends StatelessWidget {
 }
 
 class OrderForm extends StatefulWidget {
+  const OrderForm({super.key});
 
   @override
-  _OrderFormState createState() => _OrderFormState();
+  OrderFormState createState() => OrderFormState();
 }
 
-class _OrderFormState extends State<OrderForm> {
-
-  // const OrderForm({super.key});
-
+class OrderFormState extends State<OrderForm> {
   @override
   Widget build(BuildContext context) {
     final orderData = Provider.of<Order>(context);
@@ -182,10 +180,10 @@ class DropdownButtonOrder extends StatefulWidget {
 
   DropdownButtonOrder({super.key, required this.items, this.orderData});
   @override
-  _DropdownButtonOrderState createState() => _DropdownButtonOrderState();
+  DropdownButtonOrderState createState() => DropdownButtonOrderState();
 }
 
-class _DropdownButtonOrderState extends State<DropdownButtonOrder> {
+class DropdownButtonOrderState extends State<DropdownButtonOrder> {
   String? _selectedItem;
 
   @override
