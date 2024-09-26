@@ -13,7 +13,7 @@ class OrderPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('注文ページ'),
       ),
-      body: const SingleChildScrollView(
+      body: SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.all(16.0),
           child: OrderForm(),
@@ -23,8 +23,15 @@ class OrderPage extends StatelessWidget {
   }
 }
 
-class OrderForm extends StatelessWidget {
-  const OrderForm({super.key});
+class OrderForm extends StatefulWidget {
+
+  @override
+  _OrderFormState createState() => _OrderFormState();
+}
+
+class _OrderFormState extends State<OrderForm> {
+
+  // const OrderForm({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -43,15 +50,17 @@ class OrderForm extends StatelessWidget {
 
         // 支払い方法選択
         const Text('支払い方法を選択'),
-        const DropdownButtonOrder(
-          items: ['現金', 'クレジットカード', 'PayPay'],
+        DropdownButtonOrder(
+          items: const ['現金', 'クレジットカード', 'PayPay'],
+          orderData: orderData//orderData.pay
         ),
         const SizedBox(height: 16.0),
 
         // 氏名入力
         const Text('氏名を入力'),
-        const TextField(
-          decoration: InputDecoration(
+        TextField(
+          controller: orderData.name,
+          decoration: const InputDecoration(
             border: OutlineInputBorder(),
             labelText: '氏名',
           ),
@@ -60,14 +69,14 @@ class OrderForm extends StatelessWidget {
 
         // 住所入力
         const Text('住所を入力'),
-        const TextField(
-          decoration: InputDecoration(
+        TextField(
+          controller: orderData.address,
+          decoration: const InputDecoration(
             border: OutlineInputBorder(),
             labelText: '住所',
           ),
         ),
         const SizedBox(height: 16.0),
-
         // 決定ボタン
         SubmitButton(orderData),
       ],
@@ -169,9 +178,9 @@ class ProductSelectButton extends StatelessWidget {
 
 class DropdownButtonOrder extends StatefulWidget {
   final List<String> items;
+  Order? orderData;
 
-  const DropdownButtonOrder({super.key, required this.items});
-
+  DropdownButtonOrder({super.key, required this.items, this.orderData});
   @override
   _DropdownButtonOrderState createState() => _DropdownButtonOrderState();
 }
@@ -188,6 +197,7 @@ class _DropdownButtonOrderState extends State<DropdownButtonOrder> {
         setState(() {
           _selectedItem = newValue;
         });
+        widget.orderData?.changePay(newValue);
       },
       items: widget.items.map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
@@ -209,28 +219,45 @@ class SubmitButton extends StatelessWidget {
     return SizedBox(
       width: double.infinity, // ボタンを横幅いっぱいに広げる
       child: ElevatedButton(
-        onPressed: () {
-          // ボタン押下時の処理
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: const Text('確認'),
-                content: const Text('注文確認画面に遷移したいね．'),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text('OK'),
-                  ),
-                ],
-              );
-            },
-          );
+        onPressed:() =>
+        {
+          if(isOrderDataCompleted(orderData)){
+            _DisplayDialog(context, "注文確認画面に遷移したいね．")
+          }else{
+            _DisplayDialog(context, "入力されていない情報があります")
+          }
         },
         child: const Text('決定'),
       ),
     );
   }
+
+ void _DisplayDialog(BuildContext context, String log){
+    showDialog(
+     context: context,
+     builder: (BuildContext context) {
+       return AlertDialog(
+         title: const Text('確認'),
+         content: Text(log),
+         actions: [
+           TextButton(
+             onPressed: () {
+               Navigator.of(context).pop();
+             },
+             child: const Text('OK'),
+           ),
+         ],
+       );
+     },
+   );
+ }
 }
+
+bool isOrderDataCompleted(orderData){
+    return orderData.store != null
+           //&& orderData.products.isNotEmpty TODO:Productページの実装
+           && orderData.pay != null
+           && orderData.name.text.isNotEmpty
+           && orderData.address.text.isNotEmpty;
+}
+
