@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../resources/product.dart';
+import '../resources/order.dart';
 
 // 商品リストのサンプルデータ
 final List<Product> products = [
@@ -32,6 +33,8 @@ class ProductForm extends StatefulWidget {
 class _ProductFormState extends State<ProductForm> {
   @override
   Widget build(BuildContext context) {
+    final orderData = Provider.of<Order>(context);
+
     return ListView.builder(
       itemCount: products.length, // 商品の数
       itemBuilder: (context, index) {
@@ -96,15 +99,16 @@ class _ProductFormState extends State<ProductForm> {
                       icon: const Icon(Icons.remove),
                       onPressed: () {
                         setState(() {
-                          if (product.num > 0) {
-                            product.num--; // 数量を減らす
+                          final currentQuantity = orderData.getOrderedProductQuantity(product);
+                          if (currentQuantity > 0) {
+                            orderData.changeOrderedProduct(product, currentQuantity - 1);
                           }
                         });
                       },
                     ),
                     // 現在の数量を表示
                     Text(
-                      '${product.num}',
+                      '${orderData.getOrderedProductQuantity(product)}',
                       style: const TextStyle(fontSize: 16),
                     ),
                     // プラスボタン
@@ -112,8 +116,10 @@ class _ProductFormState extends State<ProductForm> {
                       icon: const Icon(Icons.add),
                       onPressed: () {
                         setState(() {
-                          product.num++; // 数量を増やす
-                        });
+                          final currentQuantity = orderData.getOrderedProductQuantity(product);
+                          orderData.changeOrderedProduct(product, currentQuantity + 1);
+                          }
+                        );
                       },
                     ),
                   ],
