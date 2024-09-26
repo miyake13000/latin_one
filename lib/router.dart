@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'pages/home_page.dart';
 import 'pages/order_page.dart';
 import 'pages/store_page.dart';
+import 'pages/product_page.dart';
 import 'pages/layout.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey =
@@ -47,6 +48,15 @@ final GoRouter router = GoRouter(
               path: '/order',
               builder: (BuildContext context, GoRouterState state) =>
                 const OrderPage(),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: <RouteBase>[
+            GoRoute(
+              path: '/product',
+              builder: (BuildContext context, GoRouterState state) =>
+              const ProductPage(),
             ),
           ],
         ),
