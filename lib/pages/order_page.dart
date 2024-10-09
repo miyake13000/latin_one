@@ -42,8 +42,16 @@ class OrderFormState extends State<OrderForm> {
         StoreSelectButton(orderData.store),
         const SizedBox(height: 16.0),
 
+        // 店舗表示
+        DisplayCurrentStore(store: orderData.store),
+        const SizedBox(height: 16.0),
+
         // 商品選択ボタン
         ProductSelectButton(orderData.products),
+        const SizedBox(height: 16.0),
+
+        // 商品表示
+        DisplayCurrentProducts(products: orderData.products),
         const SizedBox(height: 16.0),
 
         // 支払い方法選択
@@ -75,6 +83,7 @@ class OrderFormState extends State<OrderForm> {
           ),
         ),
         const SizedBox(height: 16.0),
+
         // 決定ボタン
         SubmitButton(orderData),
       ],
@@ -120,6 +129,28 @@ class StoreSelectButton extends StatelessWidget {
   }
 }
 
+class DisplayCurrentStore extends StatelessWidget {
+  final Store? store;
+
+  const DisplayCurrentStore({required this.store, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    if (store == null) {
+      return const SizedBox.shrink();
+    } else {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('店舗情報'),
+          Text('店舗名: ${store!.name}'),
+          Text('住所: ${store!.address}'),
+        ],
+      );
+    }
+  }
+}
+
 class ProductSelectButton extends StatelessWidget {
   final List<OrderedProduct> products;
 
@@ -155,6 +186,28 @@ class ProductSelectButton extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class DisplayCurrentProducts extends StatelessWidget {
+  final List<OrderedProduct> products;
+
+  const DisplayCurrentProducts({required this.products, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    if (products.isEmpty) {
+      return const SizedBox.shrink();
+    } else {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('商品情報'),
+          for (var product in products)
+            Text('${product.product.name} x ${product.quantity}'),
+        ],
+      );
+    }
   }
 }
 
@@ -242,4 +295,3 @@ bool isOrderDataCompleted(orderData){
            && orderData.name.text.isNotEmpty
            && orderData.address.text.isNotEmpty;
 }
-
