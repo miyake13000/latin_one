@@ -140,12 +140,29 @@ class DisplayCurrentStore extends StatelessWidget {
       return const SizedBox.shrink();
     } else {
       return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text('店舗情報'),
-          Text('店舗名: ${store!.name}'),
-          Text('住所: ${store!.address}'),
-        ],
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text("店舗情報"),
+            Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                    const Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children:[
+                        Text("店舗名    "),
+                        Text("住所")
+                      ]
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children:[
+                        Text('${store!.name}'),
+                        Text('${store!.address}')
+                      ]
+                    )
+                ]
+            )
+          ]
       );
     }
   }
@@ -192,19 +209,68 @@ class ProductSelectButton extends StatelessWidget {
 class DisplayCurrentProducts extends StatelessWidget {
   final List<OrderedProduct> products;
 
-  const DisplayCurrentProducts({required this.products, super.key});
+  DisplayCurrentProducts({required this.products, super.key});
+  int amount=0;
 
   @override
   Widget build(BuildContext context) {
     if (products.isEmpty) {
       return const SizedBox.shrink();
     } else {
+      for(var product in products){
+        amount = amount + product.product.price*product.quantity;
+      }
+
       return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text('商品情報'),
-          for (var product in products)
-            Text('${product.product.name} x ${product.quantity}'),
+        children:[
+          const Align(alignment: Alignment.centerLeft,
+                child:Text('商品情報',textAlign: TextAlign.left)
+          ),
+          Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                for (var product in products)
+                  Row(
+                    children: [
+                      // 商品名（左揃え）
+                      Expanded(
+                        child: Text(
+                          product.product.name,
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      ),
+                      // 数量（右揃え）
+                      SizedBox(
+                        width: 100,
+                        child: Text(
+                          '${product.quantity}',
+                          textAlign: TextAlign.right,
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      ),
+                      // 価格（右揃え）
+                       SizedBox(
+                         width: 100,
+                         child: Text(
+                          '¥${product.product.price*product.quantity}',
+                           textAlign: TextAlign.right,
+                           style: const TextStyle(fontSize: 16),
+                         ),
+                       ),
+                    ],
+                  ),
+                  const Divider(
+                    color: Colors.black, // 線の色
+                    thickness: 1,       // 線の太さ
+                    indent: 0,          // 左側の余白
+                    endIndent: 0,       // 右側の余白
+                  ),
+
+              ]
+              ),
+          Align(alignment: Alignment.centerRight,
+                child:Text('合計金額: ¥${amount}')
+          )
         ],
       );
     }
