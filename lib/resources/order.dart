@@ -16,15 +16,21 @@ class Order extends ChangeNotifier {
 
   void changeOrderedProduct(Product product, int quantity) {
     int idx = products.indexWhere((o) => o.product.id == product.id);
-    if (idx == -1) {
-      products.add(OrderedProduct(product, quantity));
+    if (idx != -1) {
+      if (quantity > 0) {
+        products[idx] = OrderedProduct(product, quantity);
+      } else {
+        products.removeAt(idx);
+      }
     } else {
-      products[idx] = OrderedProduct(product, quantity);
+      if (quantity > 0) {
+        products.add(OrderedProduct(product, quantity));
+      }
     }
     notifyListeners();
   }
 
-int getOrderedProductQuantity(Product product) {
+  int getOrderedProductQuantity(Product product) {
     int idx = products.indexWhere((o) => o.product.id == product.id);
     if (idx == -1) {
       return 0;
