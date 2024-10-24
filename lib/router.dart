@@ -38,7 +38,7 @@ final GoRouter router = GoRouter(
             GoRoute(
               path: '/store',
               builder: (BuildContext context, GoRouterState state) =>
-                const StorePage(),
+                StorePage(),
             ),
           ],
         ),
