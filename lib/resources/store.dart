@@ -9,13 +9,28 @@ class Store {
   final String openingHours;
   final String holiday;
 
-  const Store(
-    this. id,
-    this.name,
-    this.location,
-    this.address,
-    this.phoneNumber,
-    this.openingHours,
-    this.holiday
-  );
+  const Store({
+    required this. id,
+    required this.name,
+    required this.location,
+    required this.address,
+    required this.phoneNumber,
+    required this.openingHours,
+    required this.holiday
+  });
+
+  Store.fromMap(Map<String, dynamic> map)
+      : this(
+              id           : map['id'],
+              name         : map['name'],
+              location     : LatLng(map['location'].latitude, map['location'].longitude),
+              address      : map['address'],
+              phoneNumber  : map['phoneNumber'],
+              openingHours : map['openingHours'],
+              holiday      : map['holiday'],
+            );
+
+  static String collectionPath() {
+    return '/stores';
+  }
 }
