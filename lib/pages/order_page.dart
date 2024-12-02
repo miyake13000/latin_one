@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../resources/order.dart';
 import '../resources/store.dart';
 
@@ -31,6 +32,7 @@ class OrderForm extends StatefulWidget {
 }
 
 class OrderFormState extends State<OrderForm> {
+
   @override
   Widget build(BuildContext context) {
     final orderData = Provider.of<Order>(context);
@@ -47,11 +49,11 @@ class OrderFormState extends State<OrderForm> {
         const SizedBox(height: 16.0),
 
         // 商品選択ボタン
-        ProductSelectButton(orderData.products),
+        ProductSelectButton(orderData.productsInfo.products),
         const SizedBox(height: 16.0),
 
         // 商品表示
-        DisplayCurrentProducts(products: orderData.products),
+        DisplayCurrentProducts(productsInfo: orderData.productsInfo),
         const SizedBox(height: 16.0),
 
         // 支払い方法選択
@@ -207,20 +209,16 @@ class ProductSelectButton extends StatelessWidget {
 }
 
 class DisplayCurrentProducts extends StatelessWidget {
-  final List<OrderedProduct> products;
+  final ProductsInfo productsInfo;
 
-  DisplayCurrentProducts({required this.products, super.key});
-  int amount=0;
+  DisplayCurrentProducts({required this.productsInfo, super.key});
 
   @override
   Widget build(BuildContext context) {
-    if (products.isEmpty) {
+
+    if (productsInfo.products.isEmpty) {
       return const SizedBox.shrink();
     } else {
-      for(var product in products){
-        amount = amount + product.product.price*product.quantity;
-      }
-
       return Column(
         children:[
           const Align(alignment: Alignment.centerLeft,
@@ -229,7 +227,7 @@ class DisplayCurrentProducts extends StatelessWidget {
           Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                for (var product in products)
+                for (var product in productsInfo.products)
                   Row(
                     children: [
                       // 商品名（左揃え）
@@ -269,7 +267,7 @@ class DisplayCurrentProducts extends StatelessWidget {
               ]
               ),
           Align(alignment: Alignment.centerRight,
-                child:Text('合計金額: ¥${amount}')
+                child:Text('合計金額: ¥${productsInfo.amount}')
           )
         ],
       );
@@ -323,7 +321,7 @@ class SubmitButton extends StatelessWidget {
         onPressed:() =>
         {
           if(isOrderDataCompleted(orderData)){
-            displayDialog(context, "注文確認画面に遷移したいね．")
+            urlLauncherMail()
           }else{
             displayDialog(context, "入力されていない情報があります")
           }
@@ -352,11 +350,42 @@ class SubmitButton extends StatelessWidget {
       },
     );
   }
+
+  Future<void> urlLauncherMail() async {
+    final String productText =
+    orderData.productsInfo.products.map((product) => '   + ${product.product.name} - ¥${product.product.price} - ${product.quantity}個').join('\n');
+
+    Uri emailLaunchUri = Uri(
+      scheme: 'mailto',
+      path: '${orderData.store?.email}',
+      queryParameters: {
+        'subject': '注文票',
+        'body': '+ 氏名: ${orderData.name.text}\n'
+            '+ 住所: ${orderData.address.text}\n'
+            '+ お支払方法: ${orderData.pay}\n'
+            '+ 購入店舗: ${orderData.store?.name}\n'
+            '+ 購入商品:\n$productText\n'
+            '+ 合計金額: ${orderData.productsInfo.amount}\n'
+      },
+    );
+    final encodedUri = emailLaunchUri.toString().replaceAll('+', '%20');
+    emailLaunchUri =  Uri.parse(encodedUri);
+
+    if (await canLaunchUrl(emailLaunchUri)) {
+      await launchUrl(emailLaunchUri);
+    } else {
+      throw 'メールアプリを起動できませんでした';
+    }
+
+    // return launch(
+    //   _emailLaunchUri.toString(),
+    // );
+  }
 }
 
 bool isOrderDataCompleted(orderData){
     return orderData.store != null
-           && orderData.products.isNotEmpty
+           && orderData.productsInfo.products.isNotEmpty
            && orderData.pay != null
            && orderData.name.text.isNotEmpty
            && orderData.address.text.isNotEmpty;
