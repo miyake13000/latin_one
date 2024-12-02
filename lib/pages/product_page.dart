@@ -6,7 +6,8 @@ import '../db/firebase/connector.dart';
 import '../resources/order.dart' as order;
 
 class ProductPage extends StatelessWidget {
-  const ProductPage({super.key});
+  final bool isSelectable;
+  const ProductPage({super.key, required this.isSelectable});
 
   @override
   Widget build(BuildContext context) {
@@ -14,20 +15,25 @@ class ProductPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('商品ページ'),
       ),
-      body: const ProductForm(),
+      body: ProductForm(isSelectable),
     );
   }
 }
 
 class ProductForm extends StatefulWidget {
-  const ProductForm({super.key});
+  final bool isSelectable;
+  const ProductForm(this.isSelectable, {super.key});
 
   @override
-  ProductFormState createState() => ProductFormState();
+  // ignore: no_logic_in_create_state
+  ProductFormState createState() => ProductFormState(isSelectable);
 }
 
 class ProductFormState extends State<ProductForm> {
   late Future<List<Product>> future;
+
+  bool isSelectable;
+  ProductFormState(this.isSelectable);
 
   @override
   initState() {
@@ -108,7 +114,9 @@ class ProductFormState extends State<ProductForm> {
                     ),
                     const SizedBox(height: 16.0),
                     // 数量の増減ボタンと表示
-                    Row(
+                    Visibility(
+                      visible: isSelectable,
+                      child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         // マイナスボタン
@@ -140,6 +148,7 @@ class ProductFormState extends State<ProductForm> {
                           },
                         ),
                       ],
+                      )
                     ),
                   ],
                 )

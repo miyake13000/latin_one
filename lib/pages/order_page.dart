@@ -193,7 +193,7 @@ class ProductSelectButton extends StatelessWidget {
           ),
         ),
         onPressed: () {
-          GoRouter.of(context).push('/product');
+          GoRouter.of(context).push('/product',extra: true);
         },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
