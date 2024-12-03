@@ -55,8 +55,10 @@ final GoRouter router = GoRouter(
           routes: <RouteBase>[
             GoRoute(
               path: '/product',
-              builder: (BuildContext context, GoRouterState state) =>
-              const ProductPage(),
+              builder: (BuildContext context, GoRouterState state) {
+                final isSelectable = state.extra as bool;
+                return ProductPage(isSelectable: isSelectable);
+              }
             ),
           ],
         ),

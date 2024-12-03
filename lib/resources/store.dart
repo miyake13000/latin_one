@@ -6,6 +6,7 @@ class Store {
   final LatLng location;
   final String address;
   final String phoneNumber;
+  final String email;
   final String openingHours;
   final String holiday;
 
@@ -15,6 +16,7 @@ class Store {
     required this.location,
     required this.address,
     required this.phoneNumber,
+    required this.email,
     required this.openingHours,
     required this.holiday
   });
@@ -26,6 +28,7 @@ class Store {
               location     : LatLng(map['location'].latitude, map['location'].longitude),
               address      : map['address'],
               phoneNumber  : map['phoneNumber'],
+              email        : map['email'],
               openingHours : map['openingHours'],
               holiday      : map['holiday'],
             );

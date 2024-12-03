@@ -4,7 +4,7 @@ import '../resources/product.dart';
 
 class Order extends ChangeNotifier {
   Store? store;
-  List<OrderedProduct> products = [];
+  ProductsInfo productsInfo = ProductsInfo([]);
   String? pay;
   var name = TextEditingController();
   var address = TextEditingController();
@@ -15,29 +15,30 @@ class Order extends ChangeNotifier {
   }
 
   void changeOrderedProduct(Product product, int quantity) {
-    int idx = products.indexWhere((o) => o.product.id == product.id);
+    int idx = productsInfo.products.indexWhere((o) => o.product.id == product.id);
     if (idx != -1) {
       if (quantity > 0) {
-        products[idx] = OrderedProduct(product, quantity);
+        productsInfo.products[idx] = OrderedProduct(product, quantity);
       } else {
-        products.removeAt(idx);
+        productsInfo.products.removeAt(idx);
       }
     } else {
       if (quantity > 0) {
-        products.add(OrderedProduct(product, quantity));
+        productsInfo.products.add(OrderedProduct(product, quantity));
       }
     }
+    productsInfo.computeAmount();
     notifyListeners();
   }
 
   int getOrderedProductQuantity(Product product) {
-    int idx = products.indexWhere((o) => o.product.id == product.id);
+    int idx = productsInfo.products.indexWhere((o) => o.product.id == product.id);
     if (idx == -1) {
       return 0;
     } else {
-      return products[idx].quantity;
+      return productsInfo.products[idx].quantity;
     }
-}
+  }
 
   void changePay(String? item){
     pay = item;
@@ -50,4 +51,22 @@ class OrderedProduct {
   final int quantity;
 
   OrderedProduct(this.product, this.quantity);
+}
+
+class ProductsInfo {
+  List<OrderedProduct> products;
+  int amount = 0;
+
+  ProductsInfo(this.products);
+
+  void computeAmount() {
+    if (products.isEmpty) {
+      amount = 0;
+    } else {
+      amount = 0;
+      for (var product in products) {
+        amount = amount + product.product.price * product.quantity;
+      }
+    }
+  }
 }
