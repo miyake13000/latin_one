@@ -4,6 +4,7 @@ import 'pages/home_page.dart';
 import 'pages/order_page.dart';
 import 'pages/store_page.dart';
 import 'pages/product_page.dart';
+import 'pages/account_page.dart';
 import 'pages/layout.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey =
@@ -15,6 +16,10 @@ final GoRouter router = GoRouter(
   navigatorKey: _rootNavigatorKey,
   initialLocation: '/',
   routes: <RouteBase>[
+    GoRoute(
+        path: "/account",
+        builder: (BuildContext context, GoRouterState state) => const AccountPage()
+    ),
     StatefulShellRoute.indexedStack(
       builder: (BuildContext context,
                 GoRouterState state,
