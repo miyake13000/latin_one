@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class AppLayout extends StatelessWidget {
   const AppLayout({
@@ -15,10 +16,17 @@ class AppLayout extends StatelessWidget {
 
       // AppBar
       appBar: AppBar(
-        leading: const Icon(Icons.menu),
         title: const Text('LatinOne'),
         backgroundColor: Colors.orange,
         centerTitle: true,
+        leading: IconButton(
+          icon: (FirebaseAuth.instance.currentUser == null)?
+            const Icon(Icons.login):
+            const Icon(Icons.account_circle),
+          onPressed: (){
+              GoRouter.of(context).push('/account');
+          },
+        ),
         actions: const <Widget>[
           IconButton(
             icon: Icon(Icons.email, color: Colors.white),
