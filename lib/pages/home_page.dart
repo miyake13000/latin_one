@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-
 class HomeItem{
   final String text;
   final String imagePath;
@@ -47,7 +46,7 @@ class HomePage extends StatelessWidget {
         )
       ),
       onTap: (){
-        GoRouter.of(context).go('/${homeitem.pagePath}',extra: false);
+        GoRouter.of(context).push('/${homeitem.pagePath}',extra: false);
       },
     );
   }

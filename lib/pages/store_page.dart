@@ -14,44 +14,49 @@ class StorePage extends StatelessWidget {
 
   @override
     Widget build(BuildContext context) {
-      return FutureBuilder<List<Store>>(
-        future: future,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData) {
-            return const Center(child: Text('No data found'));
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('店舗ページ'),
+        ),
+        body: FutureBuilder<List<Store>>(
+          future: future,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            } else if (!snapshot.hasData) {
+              return const Center(child: Text('No data found'));
+            }
+
+            List<Store> stores = snapshot.data!;
+            return FlutterMap(
+              options: MapOptions(
+                initialCenter: stores[0].location,
+                initialZoom: 15.0,
+              ),
+              children: [
+                // Map Tile
+                TileLayer(
+                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',          userAgentPackageName: 'com.latin_one.app',
+                  maxNativeZoom: 19,
+                ),
+
+                // Store location
+                MarkerLayer(markers: createMarkers(context, stores)),
+
+                // Attribution
+                const RichAttributionWidget(
+                  attributions: [
+                    TextSourceAttribution(
+                      'OpenStreetMap contributors',
+                    ),
+                  ],
+                ),
+              ],
+            );
           }
-
-          List<Store> stores = snapshot.data!;
-          return FlutterMap(
-            options: MapOptions(
-              initialCenter: stores[0].location,
-              initialZoom: 15.0,
-            ),
-            children: [
-              // Map Tile
-              TileLayer(
-                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',          userAgentPackageName: 'com.latin_one.app',
-                maxNativeZoom: 19,
-              ),
-
-              // Store location
-              MarkerLayer(markers: createMarkers(context, stores)),
-
-              // Attribution
-              const RichAttributionWidget(
-                attributions: [
-                  TextSourceAttribution(
-                    'OpenStreetMap contributors',
-                  ),
-                ],
-              ),
-            ],
-          );
-        }
+        )
       );
     }
 
