@@ -4,6 +4,7 @@ import 'pages/home_page.dart';
 import 'pages/order_page.dart';
 import 'pages/store_page.dart';
 import 'pages/product_page.dart';
+import 'pages/signin_page.dart';
 import 'pages/account_page.dart';
 import 'pages/layout.dart';
 import 'pages/cart_page.dart';
@@ -17,10 +18,6 @@ final GoRouter router = GoRouter(
   navigatorKey: _rootNavigatorKey,
   initialLocation: '/',
   routes: <RouteBase>[
-    GoRoute(
-        path: "/account",
-        builder: (BuildContext context, GoRouterState state) => const AccountPage()
-    ),
     StatefulShellRoute.indexedStack(
       builder: (BuildContext context,
                 GoRouterState state,
@@ -34,8 +31,7 @@ final GoRouter router = GoRouter(
           routes: <RouteBase>[
             GoRoute(
               path: '/',
-              builder: (BuildContext context, GoRouterState state) =>
-                const HomePage(),
+              builder: (BuildContext context, GoRouterState state) => const HomePage(),
             ),
           ],
         ),
@@ -43,8 +39,7 @@ final GoRouter router = GoRouter(
           routes: <RouteBase>[
             GoRoute(
               path: '/store',
-              builder: (BuildContext context, GoRouterState state) =>
-                StorePage(),
+              builder: (BuildContext context, GoRouterState state) => StorePage(),
             ),
           ],
         ),
@@ -52,8 +47,7 @@ final GoRouter router = GoRouter(
           routes: <RouteBase>[
             GoRoute(
               path: '/order',
-              builder: (BuildContext context, GoRouterState state) =>
-                const OrderPage(),
+              builder: (BuildContext context, GoRouterState state) => const OrderPage(),
             ),
           ],
         ),
@@ -72,6 +66,22 @@ final GoRouter router = GoRouter(
               path: '/cart',
               builder: (BuildContext context, GoRouterState state) =>
                 const CartPage(),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: <RouteBase>[
+            GoRoute(
+              path: '/signin',
+              builder: (BuildContext context, GoRouterState state) => const SigninPage(),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: <RouteBase>[
+            GoRoute(
+              path: '/account',
+              builder: (BuildContext context, GoRouterState state) => const AccountPage(),
             ),
           ],
         ),
