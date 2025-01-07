@@ -40,33 +40,7 @@ class AppLayout extends StatelessWidget {
       ),
 
       //Body
-      body: navigationShell,
-
-      // BottomNavigationBar
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        onTap: (int index) => navigationShell.goBranch(index),
-        currentIndex: navigationShell.currentIndex,
-        fixedColor: Colors.blueAccent,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.store),
-            label: 'Store',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.local_shipping),
-            label: 'Order',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart),
-            label: 'Product',
-          ),
-        ],
-      ),
+      body: navigationShell
     );
   }
 }
