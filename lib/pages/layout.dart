@@ -27,46 +27,26 @@ class AppLayout extends StatelessWidget {
               GoRouter.of(context).push('/account');
           },
         ),
-        actions: const <Widget>[
+        actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.email, color: Colors.white),
-            onPressed: null, //TODO:実装
+            icon: const Icon(Icons.home, color: Colors.white),
+            onPressed: (){
+              GoRouter.of(context).go('/');
+            }
           ),
-          IconButton(
-            icon: Icon(Icons.settings, color: Colors.white),
-            onPressed: null, //TODO:実装
-          ),
+          // const IconButton(
+          //   icon: Icon(Icons.email, color: Colors.white),
+          //   onPressed: null, //TODO:実装
+          // ),
+          // const IconButton(
+          //   icon: Icon(Icons.settings, color: Colors.white),
+          //   onPressed: null, //TODO:実装
+          // ),
         ],
       ),
 
       //Body
-      body: navigationShell,
-
-      // BottomNavigationBar
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        onTap: (int index) => navigationShell.goBranch(index),
-        currentIndex: navigationShell.currentIndex,
-        fixedColor: Colors.blueAccent,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.store),
-            label: 'Store',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.local_shipping),
-            label: 'Order',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart),
-            label: 'Product',
-          ),
-        ],
-      ),
+      body: navigationShell
     );
   }
 }
