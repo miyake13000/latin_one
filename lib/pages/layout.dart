@@ -34,14 +34,14 @@ class AppLayout extends StatelessWidget {
               GoRouter.of(context).go('/');
             }
           ),
-          const IconButton(
-            icon: Icon(Icons.email, color: Colors.white),
-            onPressed: null, //TODO:実装
-          ),
-          const IconButton(
-            icon: Icon(Icons.settings, color: Colors.white),
-            onPressed: null, //TODO:実装
-          ),
+          // const IconButton(
+          //   icon: Icon(Icons.email, color: Colors.white),
+          //   onPressed: null, //TODO:実装
+          // ),
+          // const IconButton(
+          //   icon: Icon(Icons.settings, color: Colors.white),
+          //   onPressed: null, //TODO:実装
+          // ),
         ],
       ),
 
