@@ -1,61 +1,59 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-
-
-class HomeItem{
-  final String text;
-  final String imagePath;
-  final String pagePath;
-
-  HomeItem(this.text, this.imagePath, this.pagePath);
-}
-
-List<HomeItem> homeitems =
-  [HomeItem("Order", "IMG_8832.jpg", "order"),
-   HomeItem("Product", "IMG_8833.jpg", "product"),
-   HomeItem("Store", "IMG_8834.jpg", "store")
-  ];
+import 'package:latin_one/pages/product_page.dart';
+import 'package:provider/provider.dart';
+import '../resources/order.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
-      itemBuilder: (BuildContext context, int index){
-        return _menuItem(context, homeitems[index]);
-      },
-      separatorBuilder: (BuildContext context, int index){
-        return separatorItem();
-      },
-      itemCount: homeitems.length,
-    );
-  }
+    final orderData = Provider.of<Order>(context);
 
-  Widget _menuItem(BuildContext context, HomeItem homeitem){
-    return GestureDetector(
-      child:Container(
-        height: 300,
-        width: 500,
-        decoration: BoxDecoration(
-          image: DecorationImage(image: AssetImage("images/${homeitem.imagePath}")),
+    return Column(
+      children: [
+        // 広告バナー
+        Container(
+          height: 100,
+          color: Colors.blueAccent,
+          child: const Center(
+            child: Text(
+              '広告バナーなどという姑息な収益手段\nなんぞ取りおってからに  \\\(゜□゜\\\)',
+              style: TextStyle(color: Colors.white, fontSize: 18),
+            ),
+          ),
         ),
-        child: Center(
-            child: Text(homeitem.text,
-                style: const TextStyle(fontSize: 50)
-            )
-        )
-      ),
-      onTap: (){
-        GoRouter.of(context).go('/${homeitem.pagePath}',extra: false);
-      },
-    );
-  }
-
-  Widget separatorItem() {
-    return Container(
-      height: 10,
-      color: Colors.white,
+        // ListView
+        Expanded(
+          child: const ProductPage(isSelectable: true),
+        ),
+        // 確定ボタン部分
+        Container(
+          padding: const EdgeInsets.all(16.0),
+          child: SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                // ボタン押下時の処理
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('確定ボタンが押されました')),
+                );
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const SizedBox(width: 8.0),
+                  const Icon(
+                    Icons.shopping_cart,
+                    size: 40.0,
+                  ),
+                  Text('${orderData.productsInfo.products.length} 個:  ￥${orderData.productsInfo.amount}'),
+                ],
+              )
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
