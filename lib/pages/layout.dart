@@ -27,12 +27,18 @@ class AppLayout extends StatelessWidget {
               GoRouter.of(context).push('/account');
           },
         ),
-        actions: const <Widget>[
+        actions: <Widget>[
           IconButton(
+            icon: const Icon(Icons.home, color: Colors.white),
+            onPressed: (){
+              GoRouter.of(context).go('/');
+            }
+          ),
+          const IconButton(
             icon: Icon(Icons.email, color: Colors.white),
             onPressed: null, //TODO:実装
           ),
-          IconButton(
+          const IconButton(
             icon: Icon(Icons.settings, color: Colors.white),
             onPressed: null, //TODO:実装
           ),
