@@ -19,7 +19,7 @@ class HomePage extends StatelessWidget {
           color: Colors.blueAccent,
           child: const Center(
             child: Text(
-              '広告バナーなどという姑息な収益手段\nなんぞ取りおってからに  \\(゜□゜\\)',
+              '広告バナー',
               style: TextStyle(color: Colors.white, fontSize: 18),
             ),
           ),
