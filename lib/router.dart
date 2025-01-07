@@ -6,6 +6,7 @@ import 'pages/store_page.dart';
 import 'pages/product_page.dart';
 import 'pages/account_page.dart';
 import 'pages/layout.dart';
+import 'pages/cart_page.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey =
     GlobalKey<NavigatorState>(debugLabel: 'root');
@@ -60,10 +61,17 @@ final GoRouter router = GoRouter(
           routes: <RouteBase>[
             GoRoute(
               path: '/product',
-              builder: (BuildContext context, GoRouterState state) {
-                final isSelectable = state.extra as bool;
-                return ProductPage(isSelectable: isSelectable);
-              }
+              builder: (BuildContext context, GoRouterState state) =>
+                const ProductPage()
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: <RouteBase>[
+            GoRoute(
+              path: '/cart',
+              builder: (BuildContext context, GoRouterState state) =>
+                const CartPage(),
             ),
           ],
         ),

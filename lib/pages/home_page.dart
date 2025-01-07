@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:latin_one/pages/product_page.dart';
 import 'package:provider/provider.dart';
 import '../resources/order.dart';
@@ -18,14 +19,14 @@ class HomePage extends StatelessWidget {
           color: Colors.blueAccent,
           child: const Center(
             child: Text(
-              '広告バナーなどという姑息な収益手段\nなんぞ取りおってからに  \\\(゜□゜\\\)',
+              '広告バナーなどという姑息な収益手段\nなんぞ取りおってからに  \\(゜□゜\\)',
               style: TextStyle(color: Colors.white, fontSize: 18),
             ),
           ),
         ),
         // ListView
-        Expanded(
-          child: const ProductPage(isSelectable: true),
+        const Expanded(
+          child: ProductPage(),
         ),
         // 確定ボタン部分
         Container(
@@ -35,9 +36,7 @@ class HomePage extends StatelessWidget {
             child: ElevatedButton(
               onPressed: () {
                 // ボタン押下時の処理
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('確定ボタンが押されました')),
-                );
+                GoRouter.of(context).push('/cart');
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,

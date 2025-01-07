@@ -40,20 +40,16 @@ class OrderFormState extends State<OrderForm> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // 商品表示
+        DisplayCurrentProducts(productsInfo: orderData.productsInfo),
+        const SizedBox(height: 24.0),
+
         // 店舗選択ボタン
         StoreSelectButton(orderData.store),
         const SizedBox(height: 16.0),
 
         // 店舗表示
         DisplayCurrentStore(store: orderData.store),
-        const SizedBox(height: 16.0),
-
-        // 商品選択ボタン
-        ProductSelectButton(orderData.productsInfo.products),
-        const SizedBox(height: 16.0),
-
-        // 商品表示
-        DisplayCurrentProducts(productsInfo: orderData.productsInfo),
         const SizedBox(height: 16.0),
 
         // 支払い方法選択
@@ -167,44 +163,6 @@ class DisplayCurrentStore extends StatelessWidget {
           ]
       );
     }
-  }
-}
-
-class ProductSelectButton extends StatelessWidget {
-  final List<OrderedProduct> products;
-
-  const ProductSelectButton(this.products, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    String text;
-    if (products.isEmpty) {
-      text = '商品を選択';
-    } else {
-      text = '商品を選択済み';
-    }
-
-    return SizedBox(
-      width: double.infinity, // ボタンを横幅いっぱいに広げる
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.zero, // 四角にするために角丸を0に設定
-          ),
-        ),
-        onPressed: () {
-          GoRouter.of(context).push('/product',extra: true);
-        },
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(text),
-            const SizedBox(width: 8.0),
-            const Icon(Icons.arrow_circle_right),
-          ],
-        ),
-      ),
-    );
   }
 }
 
