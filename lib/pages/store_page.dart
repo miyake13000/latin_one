@@ -123,7 +123,7 @@ class StorePage extends StatelessWidget {
               ElevatedButton(
                 onPressed: () => {
                   orderData.changeStore(store),
-                  Navigator.pop(context),
+                  GoRouter.of(context).push('/product'),
                   // GoRouter.of(context).go('/order'),
                   context.pop(),
                 },

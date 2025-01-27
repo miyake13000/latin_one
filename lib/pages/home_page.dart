@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:latin_one/pages/product_page.dart';
-import 'package:provider/provider.dart';
-import '../resources/order.dart';
+import 'package:latin_one/resources/product_list.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final orderData = Provider.of<Order>(context);
 
     return Column(
       children: [
@@ -26,7 +23,7 @@ class HomePage extends StatelessWidget {
         ),
         // ListView
         const Expanded(
-          child: ProductPage(),
+          child: ProductList(page: false),
         ),
         // 確定ボタン部分
         Container(
@@ -36,17 +33,17 @@ class HomePage extends StatelessWidget {
             child: ElevatedButton(
               onPressed: () {
                 // ボタン押下時の処理
-                GoRouter.of(context).push('/cart');
+                GoRouter.of(context).push('/store');
               },
-              child: Row(
+              child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const SizedBox(width: 8.0),
-                  const Icon(
-                    Icons.shopping_cart,
+                  SizedBox(width: 8.0),
+                  Icon(
+                    Icons.store,
                     size: 40.0,
                   ),
-                  Text('${orderData.productsInfo.products.length} 個:  ￥${orderData.productsInfo.amount}'),
+                  Text('店舗選択画面'),
                 ],
               )
             ),
