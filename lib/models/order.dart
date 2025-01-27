@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../resources/store.dart';
-import '../resources/product.dart';
+import '../models/store.dart';
+import '../models/product.dart';
 
 class Order extends ChangeNotifier {
   Store? store;

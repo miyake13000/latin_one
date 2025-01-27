@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
-//import 'package:cloud_firestore/cloud_firestore.dart';
-import 'resources/order.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fireauth;
+import 'models/order.dart';
+import 'models/user.dart';
 import 'router.dart';
 import 'firebase_options.dart';
 
@@ -13,24 +14,29 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  runApp(App());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => Order()),
+        ChangeNotifierProvider(create: (_) =>
+          User.fromFireAuthUser(fireauth.FirebaseAuth.instance.currentUser)),
+      ],
+      child: const App(),
+    ),
+  );
 }
 
 class App extends StatelessWidget {
-  App({super.key});
-  final Order orderData = Order();
+  const App({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<Order>(
-      create: (context) => Order(),
-      child: MaterialApp.router(
-        title: 'LatinOne',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        routerConfig: router,
+    return MaterialApp.router(
+      title: 'LatinOne',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
       ),
+      routerConfig: router,
     );
   }
 }

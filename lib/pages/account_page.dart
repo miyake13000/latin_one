@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fireauth;
 import 'package:go_router/go_router.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
+import '../models/user.dart';
 
 class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
@@ -17,189 +18,128 @@ class _AccountPageState extends State<AccountPage> {
   final _newNameController = TextEditingController();
   final _newAddressController = TextEditingController();
 
-  String? _name;
-  String? _address;
-  final String? _email = FirebaseAuth.instance.currentUser?.email;
-  final String? _uid = FirebaseAuth.instance.currentUser?.uid;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadUserData();
-  }
-
-  Future<void> _loadUserData() async {
-    if (_uid != null) {
-      final userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(_uid)
-          .get();
-
-      if (userDoc.exists) {
-        setState(() {
-          _name = userDoc.data()?['name'] as String?;
-          _address = userDoc.data()?['address'] as String?;
-        });
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('アカウント情報'),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Email: ${_email ?? "未設定"}'),
-            const SizedBox(height: 8),
-            Text('名前: ${_name ?? "未設定"}'),
-            const SizedBox(height: 8),
-            Text('住所: ${_address ?? "未設定"}'),
-            const SizedBox(height: 24),
+    return Consumer<User>(
+      builder: (context, user, child) {
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text('アカウント情報'),
+          ),
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Email: ${user.email}'),
+                const SizedBox(height: 8),
+                Text('名前: ${user.name ?? "未設定"}'),
+                const SizedBox(height: 8),
+                Text('住所: ${user.address ?? "未設定"}'),
+                const SizedBox(height: 24),
 
-            _buildSection(
-              title: 'E-mail を変更する',
-              controller: _newEmailController,
-              labelText: '新しい E-mail',
-              buttonText: 'E-mail を変更',
-              onPressed: () async {
-                try {
-                  await FirebaseAuth.instance.currentUser
-                      ?.updateEmail(_newEmailController.text);
-                  setState(() {});
-                  if (mounted) {
-                    Fluttertoast.showToast(msg: "メールアドレスを更新しました");
+                _buildInfoChanger(
+                  target: 'E-mail',
+                  controller: _newEmailController,
+                  changer: (text) async {
+                    await fireauth.FirebaseAuth.instance.currentUser
+                      ?.verifyBeforeUpdateEmail(text);
+                  },
+                ),
+
+                _buildInfoChanger(
+                  target: 'Password',
+                  controller: _newPasswordController,
+                  needMusk: true,
+                  changer: (text) async {
+                    await fireauth.FirebaseAuth.instance.currentUser
+                      ?.updatePassword(text);
                   }
-                } catch (e) {
-                  if (mounted) {
-                    Fluttertoast.showToast(msg: "エラー: ${e.toString()}");
+                ),
+
+                _buildInfoChanger(
+                  target: '名前',
+                  controller: _newNameController,
+                  changer: (text) async {
+                    user.updateName(text);
                   }
-                }
-              },
+                ),
+
+                  _buildInfoChanger(
+                  target: '住所',
+                  controller: _newAddressController,
+                  changer: (text) async {
+                    user.updateAddress(text);
+                  }
+                ),
+
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      try {
+                        await fireauth.FirebaseAuth.instance.signOut();
+                        if (context.mounted) {
+                          Fluttertoast.showToast(msg: "ログアウトしました");
+                          GoRouter.of(context).go('/');
+                        }
+                      } catch (e) {
+                        if (mounted) {
+                          Fluttertoast.showToast(msg: "エラー: ${e.toString()}");
+                        }
+                      }
+                    },
+                    child: const Text("ログアウト"),
+                  ),
+                ),
+              ],
             ),
-
-            _buildSection(
-              title: 'Password を変更する',
-              controller: _newPasswordController,
-              labelText: '新しい Password',
-              buttonText: 'Password を変更',
-              isPassword: true,
-              onPressed: () async {
-                try {
-                  await FirebaseAuth.instance.currentUser
-                      ?.updatePassword(_newPasswordController.text);
-                  if (mounted) {
-                    Fluttertoast.showToast(msg: "パスワードを更新しました");
-
-                  }
-                } catch (e) {
-                  if (mounted) {
-                    Fluttertoast.showToast(msg: "エラー: ${e.toString()}");
-                  }
-                }
-              },
-            ),
-
-            _buildSection(
-              title: '名前を変更する',
-              controller: _newNameController,
-              labelText: '新しい名前',
-              buttonText: '名前を変更',
-              onPressed: () async {
-                try {
-                  await FirebaseFirestore.instance
-                      .collection('users')
-                      .doc(_uid)
-                      .update({'name': _newNameController.text});
-                  await _loadUserData();
-                  if (mounted) {
-                    Fluttertoast.showToast(msg: "名前を更新しました");
-                  }
-                } catch (e) {
-                  if (mounted) {
-                    Fluttertoast.showToast(msg: "エラー: ${e.toString()}");
-                  }
-                }
-              },
-            ),
-
-            _buildSection(
-              title: '住所を変更する',
-              controller: _newAddressController,
-              labelText: '新しい住所',
-              buttonText: '住所を変更',
-              onPressed: () async {
-                try {
-                  await FirebaseFirestore.instance
-                      .collection('users')
-                      .doc(_uid)
-                      .update({'address': _newAddressController.text});
-                  await _loadUserData();
-                  if (mounted) {
-                    Fluttertoast.showToast(msg: "住所を更新しました");
-                  }
-                } catch (e) {
-                  if (mounted) {
-                    Fluttertoast.showToast(msg: "エラー: ${e.toString()}");
-                  }
-                }
-              },
-            ),
-
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () async {
-                  await FirebaseAuth.instance.signOut();
-                  if (mounted) {
-                    context.go('/');
-                  }
-                },
-                child: const Text('ログアウト'),
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildSection({
-    required String title,
+  Widget _buildInfoChanger({
+    required String target,
     required TextEditingController controller,
-    required String labelText,
-    required String buttonText,
-    required VoidCallback onPressed,
-    bool isPassword = false,
+    required Future<void> Function(String) changer,
+    bool needMusk = false,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          title,
+          "$target を変更",
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
         TextField(
           controller: controller,
           decoration: InputDecoration(
-            labelText: labelText,
+            labelText: "新しい $target",
             border: const OutlineInputBorder(),
           ),
-          obscureText: isPassword,
+          obscureText: needMusk,
         ),
         const SizedBox(height: 8),
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
-            onPressed: onPressed,
-            child: Text(buttonText),
+            onPressed: () async {
+              try {
+                await changer(controller.text);
+                if (mounted) {
+                  Fluttertoast.showToast(msg: "$targetを更新しました");
+                }
+              } catch (e) {
+                if (mounted) {
+                  Fluttertoast.showToast(msg: "エラー: ${e.toString()}");
+                }
+              }
+            },
+            child: Text("$targetを変更"),
           ),
         ),
         const SizedBox(height: 24),

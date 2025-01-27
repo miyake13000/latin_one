@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../resources/order.dart';
-import '../resources/store.dart';
+import '../models/order.dart';
+import '../models/store.dart';
 
 class OrderPage extends StatelessWidget {
   const OrderPage({super.key});

@@ -4,9 +4,9 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../resources/order.dart' as order;
-import '../resources/store.dart';
-import '../db/firebase/connector.dart';
+import '../models/order.dart' as order;
+import '../models/store.dart';
+import '../db/firebase.dart';
 
 class StorePage extends StatelessWidget {
   StorePage({super.key});

@@ -16,6 +16,8 @@ class _SigninPageState extends State<SigninPage> {
   final _loginPasswordController = TextEditingController();
   final _registerEmailController = TextEditingController();
   final _registerPasswordController = TextEditingController();
+  final _registerNameController = TextEditingController();
+  final _registerAddressController = TextEditingController();
 
   Future<void> _signIn() async {
     try {
@@ -62,10 +64,8 @@ class _SigninPageState extends State<SigninPage> {
           .collection('users')
           .doc(userCredential.user!.uid)
           .set({
-        'name': '',
-        'address': '',
-        'email': _registerEmailController.text,
-        'createdAt': FieldValue.serverTimestamp(),
+        'name': _registerNameController.text,
+        'address': _registerAddressController.text,
       });
 
       if (mounted) {
@@ -151,6 +151,24 @@ class _SigninPageState extends State<SigninPage> {
               controller: _registerPasswordController,
               decoration: const InputDecoration(
                 labelText: 'パスワード',
+                border: OutlineInputBorder(),
+              ),
+              obscureText: true,
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _registerNameController,
+              decoration: const InputDecoration(
+                labelText: 'お名前',
+                border: OutlineInputBorder(),
+              ),
+              obscureText: true,
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _registerAddressController,
+              decoration: const InputDecoration(
+                labelText: '住所',
                 border: OutlineInputBorder(),
               ),
               obscureText: true,

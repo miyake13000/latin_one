@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latin_one/resources/product_list.dart';
 import 'package:provider/provider.dart';
-import '../resources/order.dart';
+import '../models/product.dart';
+import '../db/firebase.dart';
+import '../models/order.dart' as order;
 
 class ProductPage extends StatelessWidget {
   const ProductPage({super.key});
