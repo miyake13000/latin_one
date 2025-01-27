@@ -44,9 +44,9 @@ class OrderFormState extends State<OrderForm> {
         DisplayCurrentProducts(productsInfo: orderData.productsInfo),
         const SizedBox(height: 24.0),
 
-        // 店舗選択ボタン
-        StoreSelectButton(orderData.store),
-        const SizedBox(height: 16.0),
+        // // 店舗選択ボタン
+        // StoreSelectButton(orderData.store),
+        // const SizedBox(height: 16.0),
 
         // 店舗表示
         DisplayCurrentStore(store: orderData.store),
