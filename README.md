@@ -1,16 +1,34 @@
 # latin_one
-
 Coffee order app
 
-## Getting Started
+## Overview
+Intuitive  coffee order app
+![nothing](./nothing) 
 
-This project is a starting point for a Flutter application.
+## Build
+### Requirements
+1. Install Flutter >= 3.24 from [Official Webpage](https://docs.flutter.dev/get-started/install)
+2. Set up Firebase project
+    * You create Firebase project from [Firebase Console](https://console.firebase.google.com/)
+    * Activate Firebase Cloud Firestore and Firebase FireAuth
+3. Set up Firebase CLI from [here](https://firebase.google.com/docs/cli)
+    * Example (follow the above page)
+        ```bash
+        curl -sL https://firebase.tools | bash
+        firebase login
+        dart pub global activate flutterfire_cli
+        ```
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### Setup
+1. Clone this repository
+    ```bash
+    git clone https://github.com/miyake13000/latin_one.git && cd latin_one
+    ```
+2. Setup Firebase
+    ```bash
+    flutterfire configure
+    ```
+3. Build
+    ```bash
+    flutter run
+    ```
