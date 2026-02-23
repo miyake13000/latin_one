@@ -9,7 +9,8 @@ part of 'store.dart';
 _$StoreImpl _$$StoreImplFromJson(Map<String, dynamic> json) => _$StoreImpl(
       id: (json['id'] as num).toInt(),
       name: json['name'] as String,
-      location: LatLng.fromJson(json['location'] as Map<String, dynamic>),
+      location: const GeoPointLatLngConverter()
+          .fromJson(json['location'] as GeoPoint),
       address: json['address'] as String,
       phoneNumber: json['phoneNumber'] as String,
       email: json['email'] as String,
@@ -21,7 +22,7 @@ Map<String, dynamic> _$$StoreImplToJson(_$StoreImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
-      'location': instance.location,
+      'location': const GeoPointLatLngConverter().toJson(instance.location),
       'address': instance.address,
       'phoneNumber': instance.phoneNumber,
       'email': instance.email,

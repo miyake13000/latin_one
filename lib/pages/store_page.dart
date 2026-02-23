@@ -1,161 +1,69 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../models/order.dart' as order;
-import '../models/store.dart';
-import '../db/firebase.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class StorePage extends StatelessWidget {
-  StorePage({super.key});
-  final Future<List<Store>> future = fetchStore(FirebaseFirestore.instance);
+import '../controllers/order_controller.dart';
+import '../models/store.dart';
+import '../providers.dart';
+
+class StorePage extends ConsumerWidget {
+  const StorePage({super.key});
 
   @override
-    Widget build(BuildContext context) {
-<<<<<<< HEAD
-      return Scaffold(
-        appBar: AppBar(
-          title: const Text('店舗ページ'),
-        ),
-        body: FutureBuilder<List<Store>>(
-            future: future,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasError) {
-                return Center(child: Text('Error: ${snapshot.error}'));
-              } else if (!snapshot.hasData) {
-                return const Center(child: Text('No data found'));
-              }
+  Widget build(BuildContext context, WidgetRef ref) {
+    final storeFuture = ref.watch(storeProvider);
+    final orderNotifier = ref.watch(orderProvider.notifier);
 
-              List<Store> stores = snapshot.data!;
-              return FlutterMap(
-                options: MapOptions(
-                  initialCenter: stores[0].location,
-                  initialZoom: 15.0,
-                ),
-                children: [
-                  // Map Tile
-                  TileLayer(
-                    urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',          userAgentPackageName: 'com.latin_one.app',
-                    maxNativeZoom: 19,
-                  ),
-
-                  // Store location
-                  MarkerLayer(markers: createMarkers(context, stores)),
-
-                  // Attribution
-                  const RichAttributionWidget(
-                    attributions: [
-                      TextSourceAttribution(
-                        'OpenStreetMap contributors',
-                      ),
-                    ],
-                  ),
-                ],
-              );
-            }
-        ),
-    );
-
-||||||| parent of 54bcbb4 (Update login page)
-      return FutureBuilder<List<Store>>(
-        future: future,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData) {
-            return const Center(child: Text('No data found'));
-          }
-
-          List<Store> stores = snapshot.data!;
-          return FlutterMap(
-            options: MapOptions(
-              initialCenter: stores[0].location,
-              initialZoom: 15.0,
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('店舗ページ'),
+      ),
+      body: storeFuture.when(
+        data: (stores) => FlutterMap(
+          options: MapOptions(
+            initialCenter: stores[0].location,
+            initialZoom: 15.0,
+          ),
+          children: [
+            TileLayer(
+              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+              userAgentPackageName: 'com.latin_one.app',
+              maxNativeZoom: 19,
             ),
-            children: [
-              // Map Tile
-              TileLayer(
-                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',          userAgentPackageName: 'com.latin_one.app',
-                maxNativeZoom: 19,
-              ),
 
-              // Store location
-              MarkerLayer(markers: createMarkers(context, stores)),
+            // Store location
+            MarkerLayer(markers: createMarkers(context, stores, orderNotifier)),
 
-              // Attribution
-              const RichAttributionWidget(
-                attributions: [
-                  TextSourceAttribution(
-                    'OpenStreetMap contributors',
-                  ),
-                ],
-              ),
-            ],
-          );
-        }
-      );
-=======
-      return Scaffold(
-        appBar: AppBar(
-          title: const Text('店舗ページ'),
-        ),
-        body: FutureBuilder<List<Store>>(
-          future: future,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}'));
-            } else if (!snapshot.hasData) {
-              return const Center(child: Text('No data found'));
-            }
-
-            List<Store> stores = snapshot.data!;
-            return FlutterMap(
-              options: MapOptions(
-                initialCenter: stores[0].location,
-                initialZoom: 15.0,
-              ),
-              children: [
-                // Map Tile
-                TileLayer(
-                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',          userAgentPackageName: 'com.latin_one.app',
-                  maxNativeZoom: 19,
-                ),
-
-                // Store location
-                MarkerLayer(markers: createMarkers(context, stores)),
-
-                // Attribution
-                const RichAttributionWidget(
-                  attributions: [
-                    TextSourceAttribution(
-                      'OpenStreetMap contributors',
-                    ),
-                  ],
+            // Attribution
+            const RichAttributionWidget(
+              attributions: [
+                TextSourceAttribution(
+                  'OpenStreetMap contributors',
                 ),
               ],
-            );
-          }
-        )
-      );
->>>>>>> 54bcbb4 (Update login page)
-    }
+            ),
+          ],
+        ),
+        error: (error, stack) => Center(
+          child: Text('エラーが発生しました: ${error.toString()}'),
+        ),
+        loading: () => const Center(
+          child: CircularProgressIndicator(),
+        ),
+      ),
+    );
+  }
 
-  List<Marker> createMarkers(BuildContext ctx, List<Store> stores) {
+  List<Marker> createMarkers(BuildContext ctx, List<Store> stores, OrderController order) {
     var markers = <Marker>[];
     for (var store in stores) {
       markers.add(Marker(
             point: store.location,
             child: GestureDetector(
           onTap: () {
-            showStoreInfo(store, ctx);
+            showStoreInfo(store, ctx, order);
           },
           behavior: HitTestBehavior.opaque,
           child:  const Icon(
@@ -169,9 +77,7 @@ class StorePage extends StatelessWidget {
     return markers;
   }
 
-  void showStoreInfo(Store store, BuildContext ctx) {
-    final orderData = Provider.of<order.Order>(ctx, listen: false);
-
+  void showStoreInfo(Store store, BuildContext ctx, OrderController order) {
     showModalBottomSheet<void>(
       context: ctx,
       builder: (BuildContext context) {
@@ -209,7 +115,7 @@ class StorePage extends StatelessWidget {
               ),
               ElevatedButton(
                 onPressed: () => {
-                  orderData.changeStore(store),
+                  order.changeStore(store),
                   GoRouter.of(context).push('/product'),
                   // GoRouter.of(context).go('/order'),
                   context.pop(),

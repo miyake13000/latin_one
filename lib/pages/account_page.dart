@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart' as fireauth;
 import 'package:go_router/go_router.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../providers.dart';
 import '../models/user.dart';
 
-class AccountPage extends StatefulWidget {
+class AccountPage extends ConsumerStatefulWidget {
   const AccountPage({super.key});
 
   @override
-  State<AccountPage> createState() => _AccountPageState();
+  ConsumerState<AccountPage> createState() => _AccountPageState();
 }
 
-class _AccountPageState extends State<AccountPage> {
+class _AccountPageState extends ConsumerState<AccountPage> {
   final _newEmailController = TextEditingController();
   final _newPasswordController = TextEditingController();
   final _newNameController = TextEditingController();
@@ -20,84 +21,115 @@ class _AccountPageState extends State<AccountPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<User>(
-      builder: (context, user, child) {
-        return Scaffold(
-          appBar: AppBar(
-            title: const Text('アカウント情報'),
-          ),
-          body: SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Email: ${user.email}'),
-                const SizedBox(height: 8),
-                Text('名前: ${user.name ?? "未設定"}'),
-                const SizedBox(height: 8),
-                Text('住所: ${user.address ?? "未設定"}'),
-                const SizedBox(height: 24),
+    final userFuture = ref.watch(userProvider);
+    final userNotifier = ref.watch(userProvider.notifier);
 
-                _buildInfoChanger(
-                  target: 'E-mail',
-                  controller: _newEmailController,
-                  changer: (text) async {
-                    await fireauth.FirebaseAuth.instance.currentUser
-                      ?.verifyBeforeUpdateEmail(text);
-                  },
-                ),
-
-                _buildInfoChanger(
-                  target: 'Password',
-                  controller: _newPasswordController,
-                  needMusk: true,
-                  changer: (text) async {
-                    await fireauth.FirebaseAuth.instance.currentUser
-                      ?.updatePassword(text);
-                  }
-                ),
-
-                _buildInfoChanger(
-                  target: '名前',
-                  controller: _newNameController,
-                  changer: (text) async {
-                    user.updateName(text);
-                  }
-                ),
-
-                  _buildInfoChanger(
-                  target: '住所',
-                  controller: _newAddressController,
-                  changer: (text) async {
-                    user.updateAddress(text);
-                  }
-                ),
-
-                const SizedBox(height: 24),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      try {
-                        await fireauth.FirebaseAuth.instance.signOut();
-                        if (context.mounted) {
-                          Fluttertoast.showToast(msg: "ログアウトしました");
-                          GoRouter.of(context).go('/');
-                        }
-                      } catch (e) {
-                        if (mounted) {
-                          Fluttertoast.showToast(msg: "エラー: ${e.toString()}");
-                        }
-                      }
-                    },
-                    child: const Text("ログアウト"),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
+    final User? user = userFuture.when(
+      data: (data) => data,
+      error: (error, stack) {
+        Fluttertoast.showToast(msg: "エラーが発生しました: ${error.toString()}");
+        return null;
       },
+      loading: () {
+        // ローディング中はスピナーを表示
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            },
+          );
+        });
+        return null;
+      },
+    );
+
+    // ローディングが終わったらダイアログを閉じる
+    if (!userFuture.isLoading) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context, rootNavigator: true).pop();
+      });
+    }
+
+    if (user == null) {
+      Fluttertoast.showToast(msg: "不正な操作です");
+      GoRouter.of(context).go('/signin');
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('アカウント情報'),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Email: ${user!.email}'),
+            const SizedBox(height: 8),
+            Text('名前: ${user.name}'),
+            const SizedBox(height: 8),
+            Text('住所: ${user.address}'),
+            const SizedBox(height: 24),
+
+            _buildInfoChanger(
+              target: 'E-mail',
+              controller: _newEmailController,
+              changer: (text) async {
+                userNotifier.updateEmail(_newEmailController.text);
+              },
+            ),
+
+            _buildInfoChanger(
+              target: 'Password',
+              controller: _newPasswordController,
+              needMusk: true,
+              changer: (text) async {
+                userNotifier.updatePassword(_newPasswordController.text);
+              }
+            ),
+
+            _buildInfoChanger(
+              target: '名前',
+              controller: _newNameController,
+              changer: (text) async {
+                userNotifier.updateName(_newNameController.text);
+              }
+            ),
+
+              _buildInfoChanger(
+              target: '住所',
+              controller: _newAddressController,
+              changer: (text) async {
+                userNotifier.updateAddress(_newAddressController.text);
+              }
+            ),
+
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () async {
+                  try {
+                    await userNotifier.signout();
+                    if (mounted) {
+                      Fluttertoast.showToast(msg: "ログアウトしました");
+                      GoRouter.of(context).go('/');
+                    }
+                  } catch (e) {
+                    if (mounted) {
+                      Fluttertoast.showToast(msg: "エラー: ${e.toString()}");
+                    }
+                  }
+                },
+                child: const Text("ログアウト"),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

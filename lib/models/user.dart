@@ -8,7 +8,7 @@ class User with _$User {
   const factory User({
     required String name,
     required String email,
-    required String Address,
+    required String address,
     @JsonKey(includeToJson: false) @Default("") String uid, // toJsonの際に除外
   }) = _User;
 

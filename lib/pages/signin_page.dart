@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class SigninPage extends StatefulWidget {
+import '../providers.dart';
+
+class SigninPage extends ConsumerStatefulWidget {
   const SigninPage({super.key});
 
   @override
-  State<SigninPage> createState() => _SigninPageState();
+  ConsumerState<SigninPage> createState() => _SigninPageState();
 }
 
-class _SigninPageState extends State<SigninPage> {
+class _SigninPageState extends ConsumerState<SigninPage> {
   final _loginEmailController = TextEditingController();
   final _loginPasswordController = TextEditingController();
   final _registerEmailController = TextEditingController();
@@ -20,10 +22,12 @@ class _SigninPageState extends State<SigninPage> {
   final _registerAddressController = TextEditingController();
 
   Future<void> _signIn() async {
+    final userNotifier = ref.read(userProvider.notifier);
+
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: _loginEmailController.text,
-        password: _loginPasswordController.text,
+      await userNotifier.signin(
+        _loginEmailController.text,
+        _loginPasswordController.text,
       );
 
       if (mounted) {
@@ -52,21 +56,16 @@ class _SigninPageState extends State<SigninPage> {
   }
 
   Future<void> _register() async {
+    final userNotifier = ref.read(userProvider.notifier);
+
     try {
       // アカウントを作成
-      final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: _registerEmailController.text,
-        password: _registerPasswordController.text,
+      await userNotifier.signup(
+        _registerEmailController.text,
+        _registerPasswordController.text,
+        _registerNameController.text,
+        _registerAddressController.text,
       );
-
-      // Firestoreにユーザー情報を保存
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userCredential.user!.uid)
-          .set({
-        'name': _registerNameController.text,
-        'address': _registerAddressController.text,
-      });
 
       if (mounted) {
         Fluttertoast.showToast(msg: "登録しました");

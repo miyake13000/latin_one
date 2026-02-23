@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../providers.dart';
 import '../models/order.dart';
 import '../models/store.dart';
 
@@ -24,29 +25,27 @@ class OrderPage extends StatelessWidget {
   }
 }
 
-class OrderForm extends StatefulWidget {
+class OrderForm extends ConsumerStatefulWidget {
   const OrderForm({super.key});
 
   @override
   OrderFormState createState() => OrderFormState();
 }
 
-class OrderFormState extends State<OrderForm> {
+class OrderFormState extends ConsumerState<OrderForm> {
+  final addressController = TextEditingController();
+  final nameController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    final orderData = Provider.of<Order>(context);
+    final orderData = ref.watch(orderProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // 商品表示
-        DisplayCurrentProducts(productsInfo: orderData.productsInfo),
+        DisplayCurrentProducts(order: orderData),
         const SizedBox(height: 24.0),
-
-        // // 店舗選択ボタン
-        // StoreSelectButton(orderData.store),
-        // const SizedBox(height: 16.0),
 
         // 店舗表示
         DisplayCurrentStore(store: orderData.store),
@@ -63,7 +62,7 @@ class OrderFormState extends State<OrderForm> {
         // 氏名入力
         const Text('氏名を入力'),
         TextField(
-          controller: orderData.name,
+          controller: nameController,
           decoration: const InputDecoration(
             border: OutlineInputBorder(),
             labelText: '氏名',
@@ -74,7 +73,7 @@ class OrderFormState extends State<OrderForm> {
         // 住所入力
         const Text('住所を入力'),
         TextField(
-          controller: orderData.address,
+          controller: addressController,
           decoration: const InputDecoration(
             border: OutlineInputBorder(),
             labelText: '住所',
@@ -83,50 +82,15 @@ class OrderFormState extends State<OrderForm> {
         const SizedBox(height: 16.0),
 
         // 決定ボタン
-        SubmitButton(orderData),
+        SubmitButton(
+          nameController.text,
+          addressController.text,
+        ),
       ],
     );
   }
 
 }
-class StoreSelectButton extends StatelessWidget {
-  final Store? store;
-
-  const StoreSelectButton(this.store, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    String text;
-    if (store == null) {
-      text = '店舗を選択';
-    } else {
-      text = store!.name;
-    }
-
-    return SizedBox(
-      width: double.infinity, // ボタンを横幅いっぱいに広げる
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.zero, // 四角にするために角丸を0に設定
-          ),
-        ),
-        onPressed: () {
-          GoRouter.of(context).push('/store');
-        },
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(text),
-            const SizedBox(width: 8.0),
-            const Icon(Icons.arrow_circle_right),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class DisplayCurrentStore extends StatelessWidget {
   final Store? store;
 
@@ -154,8 +118,8 @@ class DisplayCurrentStore extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children:[
-                        Text('${store!.name}'),
-                        Text('${store!.address}')
+                        Text(store!.name),
+                        Text(store!.address)
                       ]
                     )
                 ]
@@ -167,14 +131,14 @@ class DisplayCurrentStore extends StatelessWidget {
 }
 
 class DisplayCurrentProducts extends StatelessWidget {
-  final ProductsInfo productsInfo;
+  final Order order;
 
-  DisplayCurrentProducts({required this.productsInfo, super.key});
+  const DisplayCurrentProducts({required this.order, super.key});
 
   @override
   Widget build(BuildContext context) {
 
-    if (productsInfo.products.isEmpty) {
+    if (order.products.isEmpty) {
       return const SizedBox.shrink();
     } else {
       return Column(
@@ -185,7 +149,7 @@ class DisplayCurrentProducts extends StatelessWidget {
           Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                for (var product in productsInfo.products)
+                for (var product in order.products)
                   Row(
                     children: [
                       // 商品名（左揃え）
@@ -225,7 +189,7 @@ class DisplayCurrentProducts extends StatelessWidget {
               ]
               ),
           Align(alignment: Alignment.centerRight,
-                child:Text('合計金額: ¥${productsInfo.amount}')
+                child:Text('合計金額: ¥${order.ammount()}')
           )
         ],
       );
@@ -233,7 +197,7 @@ class DisplayCurrentProducts extends StatelessWidget {
   }
 }
 
-class PaymentMethodDropdown extends StatefulWidget {
+class PaymentMethodDropdown extends ConsumerStatefulWidget {
   final List<String> methods;
   final Order? order;
 
@@ -242,11 +206,12 @@ class PaymentMethodDropdown extends StatefulWidget {
   PaymentMethodDropdownState createState() => PaymentMethodDropdownState();
 }
 
-class PaymentMethodDropdownState extends State<PaymentMethodDropdown> {
+class PaymentMethodDropdownState extends ConsumerState<PaymentMethodDropdown> {
   String? selectedItem;
 
   @override
   Widget build(BuildContext context) {
+    final orderNotifier = ref.read(orderProvider.notifier);
     return DropdownButton<String>(
       hint: const Text('選択してください'), // 初期状態のテキスト
       value: selectedItem,
@@ -254,7 +219,7 @@ class PaymentMethodDropdownState extends State<PaymentMethodDropdown> {
         setState(() {
           selectedItem = newValue;
         });
-        widget.order?.changePay(newValue);
+        orderNotifier.changePay(newValue!);
       },
       items: widget.methods.map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
@@ -266,20 +231,30 @@ class PaymentMethodDropdownState extends State<PaymentMethodDropdown> {
   }
 }
 
-class SubmitButton extends StatelessWidget {
-  final Order orderData;
+class SubmitButton extends ConsumerWidget {
+  final String name;
+  final String address;
 
-  const SubmitButton(this.orderData, {super.key});
+  const SubmitButton(
+    this.name,
+    this.address,
+    {super.key}
+  );
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final orderData = ref.watch(orderProvider);
+    final orderNotifier = ref.watch(orderProvider.notifier);
+    orderNotifier.changeName(name);
+    orderNotifier.changeAddress(address);
+
     return SizedBox(
       width: double.infinity, // ボタンを横幅いっぱいに広げる
       child: ElevatedButton(
         onPressed:() =>
         {
           if(isOrderDataCompleted(orderData)){
-            urlLauncherMail()
+            urlLauncherMail(orderData)
           }else{
             displayDialog(context, "入力されていない情報があります")
           }
@@ -309,21 +284,21 @@ class SubmitButton extends StatelessWidget {
     );
   }
 
-  Future<void> urlLauncherMail() async {
+  Future<void> urlLauncherMail(Order orderData) async {
     final String productText =
-    orderData.productsInfo.products.map((product) => '   + ${product.product.name} - ¥${product.product.price} - ${product.quantity}個').join('\n');
+    orderData.products.map((product) => '   + ${product.product.name} - ¥${product.product.price} - ${product.quantity}個').join('\n');
 
     Uri emailLaunchUri = Uri(
       scheme: 'mailto',
       path: '${orderData.store?.email}',
       queryParameters: {
         'subject': '注文票',
-        'body': '+ 氏名: ${orderData.name.text}\n'
-            '+ 住所: ${orderData.address.text}\n'
+        'body': '+ 氏名: ${orderData.name}\n'
+            '+ 住所: ${orderData.address}\n'
             '+ お支払方法: ${orderData.pay}\n'
             '+ 購入店舗: ${orderData.store?.name}\n'
             '+ 購入商品:\n$productText\n'
-            '+ 合計金額: ${orderData.productsInfo.amount}\n'
+            '+ 合計金額: ${orderData.ammount()}\n'
       },
     );
     final encodedUri = emailLaunchUri.toString().replaceAll('+', '%20');

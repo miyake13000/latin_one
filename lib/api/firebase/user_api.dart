@@ -9,13 +9,12 @@ class FirebaseUserAPI implements UserAPI {
 
     @override
     Future<void> saveUser(User user) async {
-        await firestore.collection("users").doc(user.uid).set(user.toJson());
+        await db.collection("users").doc(user.uid).set(user.toJson());
     }
 
     @override
     Future<User> fetchUser(String uid) async {
-        DocumentSnapshot userSnapshot = await firestore.collection("users").doc(uid).get();
+        DocumentSnapshot userSnapshot = await db.collection("users").doc(uid).get();
         return User.fromJson(userSnapshot.data() as Map<String, dynamic>);
     }
-
 }

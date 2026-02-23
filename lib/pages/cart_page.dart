@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
-import '../resources/order.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
+import '../providers.dart';
+import '../models/product.dart';
 
 class CartPage extends StatelessWidget {
   const CartPage({super.key});
@@ -17,22 +20,51 @@ class CartPage extends StatelessWidget {
   }
 }
 
-class CartForm extends StatefulWidget {
+class CartForm extends ConsumerStatefulWidget {
   const CartForm({super.key});
 
   @override
-  // ignore: no_logic_in_create_state
   CartFormState createState() => CartFormState();
 }
 
-class CartFormState extends State<CartForm> {
+class CartFormState extends ConsumerState<CartForm> {
   CartFormState();
 
   @override
   Widget build(BuildContext context) {
-    final orderData = Provider.of<Order>(context);
-    List<OrderedProduct> products = orderData.productsInfo.products;
     const isSelectable = true;
+    final orderData = ref.watch(orderProvider);
+    final orderNotifier = ref.watch(orderProvider.notifier);
+    final productsFuture = ref.watch(productProvider);
+
+    final products = productsFuture.when(
+      data: (data) => data,
+      error: (error, stack) {
+        Fluttertoast.showToast(msg: "エラーが発生しました: ${error.toString()}");
+        return <Product>[];
+      },
+      loading: () {
+        // ローディング中はスピナーを表示
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            },
+          );
+        });
+        return <Product>[];
+      },
+    );
+
+    // ローディングが終わったらダイアログを閉じる
+    if (!productsFuture.isLoading) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context, rootNavigator: true).pop();
+      });
+    }
 
     return Column(
       children: [
@@ -40,7 +72,7 @@ class CartFormState extends State<CartForm> {
           child: ListView.builder(
               itemCount: products.length, // 商品の数
               itemBuilder: (context, index) {
-                final product = products[index].product;
+                final product = products[index];
                 return Card(
                     margin: const EdgeInsets.symmetric(
                         vertical: 8.0,
@@ -105,16 +137,16 @@ class CartFormState extends State<CartForm> {
                                           icon: const Icon(Icons.remove),
                                           onPressed: () {
                                             setState(() {
-                                              final currentQuantity = orderData.getOrderedProductQuantity(product);
+                                              final currentQuantity = orderData.getQuantity(product);
                                               if (currentQuantity > 0) {
-                                                orderData.changeOrderedProduct(product, currentQuantity - 1);
+                                                orderNotifier.changeProduct(product, currentQuantity - 1);
                                               }
                                             });
                                           },
                                         ),
                                         // 現在の数量を表示
                                         Text(
-                                          '${orderData.getOrderedProductQuantity(product)}',
+                                          '${orderData.getQuantity(product)}',
                                           style: const TextStyle(fontSize: 16),
                                         ),
                                         // プラスボタン
@@ -122,8 +154,8 @@ class CartFormState extends State<CartForm> {
                                           icon: const Icon(Icons.add),
                                           onPressed: () {
                                             setState(() {
-                                              final currentQuantity = orderData.getOrderedProductQuantity(product);
-                                              orderData.changeOrderedProduct(product, currentQuantity + 1);
+                                              final currentQuantity = orderData.getQuantity(product);
+                                              orderNotifier.changeProduct(product, currentQuantity + 1);
                                             }
                                             );
                                           },
@@ -135,7 +167,7 @@ class CartFormState extends State<CartForm> {
                                       icon: const Icon(Icons.delete),
                                       onPressed: () {
                                         setState(() {
-                                          orderData.changeOrderedProduct(product, 0);
+                                          orderNotifier.changeProduct(product, 0);
                                         }
                                         );
                                       },

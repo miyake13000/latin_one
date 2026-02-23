@@ -22,6 +22,7 @@ Store _$StoreFromJson(Map<String, dynamic> json) {
 mixin _$Store {
   int get id => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
+  @GeoPointLatLngConverter()
   LatLng get location => throw _privateConstructorUsedError;
   String get address => throw _privateConstructorUsedError;
   String get phoneNumber => throw _privateConstructorUsedError;
@@ -46,7 +47,7 @@ abstract class $StoreCopyWith<$Res> {
   $Res call(
       {int id,
       String name,
-      LatLng location,
+      @GeoPointLatLngConverter() LatLng location,
       String address,
       String phoneNumber,
       String email,
@@ -125,7 +126,7 @@ abstract class _$$StoreImplCopyWith<$Res> implements $StoreCopyWith<$Res> {
   $Res call(
       {int id,
       String name,
-      LatLng location,
+      @GeoPointLatLngConverter() LatLng location,
       String address,
       String phoneNumber,
       String email,
@@ -198,7 +199,7 @@ class _$StoreImpl implements _Store {
   const _$StoreImpl(
       {required this.id,
       required this.name,
-      required this.location,
+      @GeoPointLatLngConverter() required this.location,
       required this.address,
       required this.phoneNumber,
       required this.email,
@@ -213,6 +214,7 @@ class _$StoreImpl implements _Store {
   @override
   final String name;
   @override
+  @GeoPointLatLngConverter()
   final LatLng location;
   @override
   final String address;
@@ -273,7 +275,7 @@ abstract class _Store implements Store {
   const factory _Store(
       {required final int id,
       required final String name,
-      required final LatLng location,
+      @GeoPointLatLngConverter() required final LatLng location,
       required final String address,
       required final String phoneNumber,
       required final String email,
@@ -287,6 +289,7 @@ abstract class _Store implements Store {
   @override
   String get name;
   @override
+  @GeoPointLatLngConverter()
   LatLng get location;
   @override
   String get address;

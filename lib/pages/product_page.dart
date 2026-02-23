@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:latin_one/resources/product_list.dart';
-import 'package:provider/provider.dart';
-import '../models/product.dart';
-import '../db/firebase.dart';
-import '../models/order.dart' as order;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ProductPage extends StatelessWidget {
+import '../providers.dart';
+import 'widgets/product_list.dart';
+
+class ProductPage extends ConsumerWidget {
   const ProductPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final orderData = Provider.of<Order>(context);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final order = ref.watch(orderProvider);
 
     return Column(
       children: [
@@ -48,7 +47,7 @@ class ProductPage extends StatelessWidget {
                     Icons.shopping_cart,
                     size: 40.0,
                   ),
-                  Text('${orderData.productsInfo.products.length} 個:  ￥${orderData.productsInfo.amount}'),
+                Text('${order.products.length} 個:  ￥${order.ammount()}'),
                 ],
               )
             ),

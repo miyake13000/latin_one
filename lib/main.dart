@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart' as fireauth;
-import 'models/order.dart';
-import 'models/user.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'router.dart';
 import 'firebase_options.dart';
 
@@ -14,16 +11,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => Order()),
-        ChangeNotifierProvider(create: (_) =>
-          User.fromFireAuthUser(fireauth.FirebaseAuth.instance.currentUser)),
-      ],
-      child: const App(),
-    ),
-  );
+  runApp(const ProviderScope(child: App()));
 }
 
 class App extends StatelessWidget {
